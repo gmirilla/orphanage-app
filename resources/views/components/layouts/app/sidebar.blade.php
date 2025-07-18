@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="">
     <head>
         @include('partials.head')
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,6 +16,12 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user" :href="route('list_children')" style="margin-top:8px;">Children</flux:navlist.item>
+                    
+                    <!--TO Properly fix a dropdown menu -->
+                    <flux:dropdown class="hidden lg:block" position="bottom" align="start">
+                        <flux:navlist.item icon="cog" :href="route('listcountry')" style="margin-top:8px;">Countries</flux:navlist.item>
+                    </flux:dropdown>
                 </flux:navlist.group>
             </flux:navlist>
 
