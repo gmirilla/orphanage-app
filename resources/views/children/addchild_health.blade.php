@@ -40,27 +40,9 @@
                 <label for="medication" class="form-label">Current Medication(s)</label>
                 <textarea name="medication" id="" cols="30" rows="10" class="form-control"></textarea>
             </div>
-  
-
 
         </div>
-        <div class="row mb-3">
-            <div class="col-2">
-                <label for="specialneed" class="form-label">Special Needs or Disabilities</label>
-                <input type="text" required   name='specialneeds' id='specialneeds' placeholder="Enter Any Special Needs or Disabilities  " class="form-control">
-            </div>
-            <div class="col-2">
-                <label for="hobby" class="form-label">Hobbies/Interest</label>
-                <input type="text" name='hobbies' id='hobby' placeholder="Enter a Hobby or Interest" class="form-control">
-            </div>
-        </div>
-        <div class="row">
-            
-            <div class="col-6">
-                <label for="academicnote" class="form-label">Academic Performance Notes</label>
-                 <textarea name="academicnote" id="note" cols="30" rows="5" placeholder="Enter any notes or remarks" class="form-control"></textarea>
-            </div>
-        </div>
+     
         <div class="row mt-3 ">
             <div class="col-auto">
                 <input type="text" name="child_id" value="{{$child->id}}" hidden>

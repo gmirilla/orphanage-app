@@ -16,6 +16,7 @@ Route::view('dashboard', 'dashboard')
 //Routes for functions directly related to the Children Model and Controllers
 Route::middleware('auth')->group(function () {
     Route::get('/children/index',[ChildController::class, 'index'])->name('list_children');
+    Route::get('/children/view_child',[ChildController::class, 'viewchild'])->name('view_child');
     Route::get('/children/register_new',[ChildController::class, 'registernew'])->name('register_newchild');
     Route::post('/children/addbasic_info',[ChildController::class, 'addbasicinfo'])->name('addbasicinfo');
     Route::post('/children/addeducation_info',[ChildController::class, 'addeducationinfo'])->name('addeduinfo');

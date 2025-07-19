@@ -43,7 +43,7 @@
                         $counter++;
                     @endphp
 
-                    <tr>
+                    <tr onclick="window.location='{{ route('view_child',['child_id' => $child->id])}}'" style="cursor: pointer;">                   
                         <td>{{$counter}}</td>
                         <td>{{$child->getFullname()}}</td>
                         <td>{{$child->gender}}</td>

@@ -24,7 +24,7 @@
     $counter=0;
 @endphp
 <div class="card">
-    <div class="card-header mb-3"><h5>PROFILE: {{$child->fullname()}}</h5></div>
+    <div class="card-header mb-3"><h5>PROFILE: {{$child->getFullname()}}</h5></div>
     <div class="card-body mb-3">
         <button class="btn btn-primary">Register New Child</button>
     </div>

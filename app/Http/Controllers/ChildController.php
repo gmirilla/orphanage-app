@@ -71,10 +71,46 @@ class ChildController extends Controller
 
         $childeducation->save();
         $childdevelopment->save();
+        $child=Child::where('id',$request->child_id)->first();
 
-        return view('dashboard');
+        return view('children.addchild_education', compact('child'));
 
     }
+
+        /**
+     * Add the Education/development info to a child being registered.
+     */
+    public function addlivinginfo(Request $request)
+    {
+        //
+        try {
+            //code...
+            $childeducation=Education::create($request->all());
+            $childdevelopment=Development::create($request->all());
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+        $childeducation->save();
+        $childdevelopment->save();
+        $child=Child::where('id',$request->child_id)->first();
+
+        return view('children.addchild_education', compact('child'));
+
+    }
+
+        /**
+     * Display the specified resource.
+     */
+    public function viewchild(Request $request)
+    {
+        //
+        $child=Child::where('id', $request->child_id)->first();
+
+        return view('children.viewchild', compact('child'));
+        
+    }
+
 
 
     /**
@@ -99,6 +135,7 @@ class ChildController extends Controller
     public function show(Child $child)
     {
         //
+
     }
 
     /**
