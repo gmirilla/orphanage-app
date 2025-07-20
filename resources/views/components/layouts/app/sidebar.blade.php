@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<style>
+.sidebarcustom {
+    color:black !important;
+    text-decoration: none !important;
+}
+</style>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="">
     <head>
         @include('partials.head')
@@ -6,21 +12,21 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-blue-200 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse sidebarcustom" wire:navigate>
                 <x-app-logo />
             </a>
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="user" :href="route('list_children')" style="margin-top:8px;">Children</flux:navlist.item>
+                    <flux:navlist.item icon="home" class="sidebarcustom" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user" class="sidebarcustom" :href="route('list_children')" style="margin-top:8px;">Children</flux:navlist.item>
                     
                     <!--TO Properly fix a dropdown menu -->
                     <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-                        <flux:navlist.item icon="cog" :href="route('listcountry')" style="margin-top:8px;">Countries</flux:navlist.item>
+                        <flux:navlist.item icon="cog" class="sidebarcustom" :href="route('listcountry')" style="margin-top:8px;">Countries</flux:navlist.item>
                     </flux:dropdown>
                 </flux:navlist.group>
             </flux:navlist>

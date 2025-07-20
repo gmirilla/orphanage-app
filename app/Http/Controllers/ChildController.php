@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\accomodationrecord;
+use App\Models\backgroundrecord;
 use App\Models\Child;
 use App\Models\country;
 use App\Models\Development;
 use App\Models\Education;
+use App\Models\Medicalrecord;
 use Illuminate\Http\Request;
 
 class ChildController extends Controller
@@ -65,37 +68,92 @@ class ChildController extends Controller
             //code...
             $childeducation=Education::create($request->all());
             $childdevelopment=Development::create($request->all());
+            $childeducation->save();
+            $childdevelopment->save();
+            $child=Child::where('id',$request->child_id)->first();
         } catch (\Throwable $th) {
             //throw $th;
         }
 
-        $childeducation->save();
-        $childdevelopment->save();
-        $child=Child::where('id',$request->child_id)->first();
+        if($request->has('addeducationrecord')){
 
-        return view('children.addchild_education', compact('child'));
+            return view('children.viewchild',compact('child'));
+        }
 
+        return view('children.addchild_health', compact('child'));
+    }
+    
+    /**
+     * Add the Medical info to a child being registered.
+     */
+    public function addmedicalinfo(Request $request)
+    {
+        //
+        try {
+            //code...
+            $childmedical=Medicalrecord::create($request->all());
+            $childmedical->save();
+            $child=Child::where('id',$request->child_id)->first();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+        if($request->has('addmedicalrecord')){
+
+            return view('children.viewchild',compact('child'));
+        }
+
+        return redirect()->route('list_children');
     }
 
+
         /**
-     * Add the Education/development info to a child being registered.
+     * Add the Accomodation  info to a child being registered.
      */
     public function addlivinginfo(Request $request)
     {
         //
         try {
             //code...
-            $childeducation=Education::create($request->all());
-            $childdevelopment=Development::create($request->all());
+            $childaccomodation=accomodationrecord::create($request->all());
+            $childaccomodation->save();
+            
         } catch (\Throwable $th) {
             //throw $th;
         }
-
-        $childeducation->save();
-        $childdevelopment->save();
+        
         $child=Child::where('id',$request->child_id)->first();
+        if($request->has('addaccomodationrecord')){
 
-        return view('children.addchild_education', compact('child'));
+            return view('children.viewchild',compact('child'));
+        }      
+
+        return redirect()->route('list_children');
+
+    }
+
+    
+        /**
+     * Add the Background  info to a child being registered.
+     */
+    public function addbkgrdinfo(Request $request)
+    {
+        //
+        try {
+            //code...
+            $childbackground=backgroundrecord::create($request->all());
+            $childbackground->save();
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        $child=Child::where('id',$request->child_id)->first();
+        if($request->has('addbackgroundinforecord')){
+
+            return view('children.viewchild',compact('child'));
+        }      
+
+        return redirect()->route('list_children');
 
     }
 

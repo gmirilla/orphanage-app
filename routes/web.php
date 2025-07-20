@@ -20,6 +20,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/children/register_new',[ChildController::class, 'registernew'])->name('register_newchild');
     Route::post('/children/addbasic_info',[ChildController::class, 'addbasicinfo'])->name('addbasicinfo');
     Route::post('/children/addeducation_info',[ChildController::class, 'addeducationinfo'])->name('addeduinfo');
+    Route::post('/children/addmedical_info',[ChildController::class, 'addmedicalinfo'])->name('addmedinfo');
+    Route::post('/children/addhousing_info',[ChildController::class, 'addlivinginfo'])->name('addaccoinfo');
+    Route::post('/children/addbackground_info',[ChildController::class, 'addbkgrdinfo'])->name('addbckinfo');
 });
 
 
