@@ -10,6 +10,18 @@
         @include('partials.head')
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<link rel="stylesheet" href=
+"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-blue-200 dark:border-zinc-700 dark:bg-zinc-900">
@@ -22,11 +34,13 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" class="sidebarcustom" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="user" class="sidebarcustom" :href="route('list_children')" style="margin-top:8px;">Children</flux:navlist.item>
+                    <flux:navlist.item icon="user-group" class="sidebarcustom" :href="route('list_children')" style="margin-top:8px;">Children</flux:navlist.item>
+                    <flux:navlist.item icon="identification" class="sidebarcustom" :href="route('list_staff')" style="margin-top:8px;">Staff</flux:navlist.item>
+                    <flux:navlist.item icon="building-library" class="sidebarcustom" :href="route('list_rooms')" style="margin-top:8px;">Accomodation/Rooms</flux:navlist.item>
                     
                     <!--TO Properly fix a dropdown menu -->
                     <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-                        <flux:navlist.item icon="cog" class="sidebarcustom" :href="route('listcountry')" style="margin-top:8px;">Countries</flux:navlist.item>
+                        <flux:navlist.item icon="map" class="sidebarcustom" :href="route('listcountry')" style="margin-top:8px;">Countries</flux:navlist.item>
                     </flux:dropdown>
                 </flux:navlist.group>
             </flux:navlist>

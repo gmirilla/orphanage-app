@@ -36,22 +36,34 @@ class Child extends Model
     
     $hobbies = Development::where('child_id', $this->id)->pluck('hobbies');
 
-    return $hobbies->isNotEmpty() ? $hobbies->implode(', ') : 'No hobbies on file';
+    $filtered = $hobbies->filter(function ($hobby) {
+        return !empty($hobby);
+    });
+
+    return $filtered->isNotEmpty() ? $filtered->implode(', ') : 'No hobbies on file';
+
     }
     
     public function getspecialneedsstring()
     {
     
     $specialneeds = Development::where('child_id', $this->id)->pluck('specialneeds');
+        $filtered = $specialneeds->filter(function ($hobby) {
+        return !empty($specialneeds);
+    });
 
-    return $specialneeds->isNotEmpty() ? $specialneeds->implode(', ') : 'No Special Needs on file';
+    return $filtered->isNotEmpty() ? $filtered->implode(', ') : 'No Special Needs on file';
     }
+
         public function getAllergystring()
     {
     
-    $specialneeds = Medicalrecord::where('child_id', $this->id)->pluck('allergy');
+    $specialneeds = Development::where('child_id', $this->id)->pluck('specialneeds');
+        $filtered = $specialneeds->filter(function ($hobby) {
+        return !empty($specialneeds);
+    });
 
-    return $specialneeds->isNotEmpty() ? $specialneeds->implode(', ') : 'No Allergy on file';
+    return $filtered->isNotEmpty() ? $filtered->implode(', ') : 'No Allergy on file';
     }
 
     public function getEducation()

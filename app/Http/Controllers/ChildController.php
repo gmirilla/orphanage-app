@@ -113,16 +113,13 @@ class ChildController extends Controller
     public function addlivinginfo(Request $request)
     {
         //
-        try {
             //code...
             $childaccomodation=accomodationrecord::create($request->all());
             $childaccomodation->save();
-            
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-        
+
         $child=Child::where('id',$request->child_id)->first();
+
+
         if($request->has('addaccomodationrecord')){
 
             return view('children.viewchild',compact('child'));
@@ -169,6 +166,65 @@ class ChildController extends Controller
         
     }
 
+            /**
+     * Add the Development  info to a child being registered.
+     */
+    public function addmiscinfo(Request $request)
+    {
+        //
+        $child=Child::where('id',$request->child_id)->first();
+
+        try {
+            //code...
+
+           $childdevelopment=Development::create($request->all());
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        
+        $child=Child::where('id',$request->child_id)->first();
+        if($request->has('addmisc')){
+
+            return view('children.viewchild',compact('child'));
+        }      
+
+        return redirect()->route('list_children');
+
+    }
+
+
+    /**
+     * Show the form for deleting individual profile info.
+     */
+    public function deleteprofileinfo(Request $request)
+    {
+        //
+        switch ($request->info) {
+            case 'EDU':
+                # code...
+                Education::destroy($request->id);
+                break;
+            case 'MED':
+                # code...
+                Medicalrecord::destroy($request->id);
+                break;
+            case 'BKG':
+                # code...
+                backgroundrecord::destroy($request->id);
+                break;
+            case 'ACC':
+                # code...
+                accomodationrecord::destroy($request->id);
+                break;         
+            default:
+                # code...
+                break;
+        }
+
+        $child=child::where('id',$request->child_id)->first();
+        return view('children.viewchild', compact('child'));
+    }
 
 
     /**

@@ -112,7 +112,7 @@
 
 
         <div class="profile-details col-5">
-            <ul class="details">
+           <ul class="details medical-record mb-3 p-3 border rounded bg-light">
                 <li><span>Name:</span> {{$child->getFullname()}}</li>
                 <li><span>Age:</span><span class="pillbutton"> {{$child->getAge()}}</span></li>
                 <li><span>Date of Birth:</span> {{$child->dateofbirth}}</li>
@@ -121,9 +121,10 @@
                 <li><span>Allergies:</span> {{$child->getAllergystring()}}</li>
                 <li><span>Hobbies:</span> {{$child->getHobbiesstring()}} <button class="btn btn-success ml-5" data-bs-toggle="modal" data-bs-target="#addHobbyModal">Add</button></li>
                 <li><span>Special Needs:</span> {{$child->getspecialneedsstring()}} <button class="btn btn-success ml-5" data-bs-toggle="modal" data-bs-target="#addSneedsModal">Add</button></li>
-                <li><span>Notes:</span> {{$child->note}}  <button class="btn btn-success ml-5">Add Note</button></li>
+                <li><span>Notes:</span><a href="#" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-message="{{$child->note}}">{{$child->note}}</a><button class="btn btn-success ml-5">Add Note</button></li>
             </ul>
         </div>
+
 
     </div>
 </div>
@@ -135,13 +136,15 @@
     <div class="profile-details col-auto card mt-3 div-container">
         @forelse ($child->getEducation() as $edurecord)
             <ul class="details education-record mb-3 p-3 border rounded bg-light">
-                <li><span>Academic Year:</span> {{$edurecord->academicyear}}</li>
-                <li><span>School Name:</span> {{$edurecord->schoolname}}</li>
-                <li><span>Current Class/Grade:</span> {{$edurecord->grade}}</li>
-                <li><span>Academic Notes:</span> {{$edurecord->academicnote}}</li>
+                <a href="{{ route('delinfo', ['child_id' => $child->id, 'info' => 'EDU', 'id' => $edurecord->id]) }}">
+                <i class="fa fa-trash text-danger text-end" style="font-size:1.6em" aria-hidden="true"></i></a>
+                <li><span>Academic Year:  </span> {{$edurecord->academicyear}} </li>
+                <li><span>School Name:  </span> {{$edurecord->schoolname}}</li>
+                <li><span>Current Class/Grade:  </span> {{$edurecord->grade}}</li>
+                <li><span>Academic Notes:  </span>  <a href="#" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-message="{{$edurecord->academicnote}}"> {{$edurecord->academicnote}}</a></li>
             </ul>
         @empty
-            <ul class="details">
+            <ul>
                 <li>No Education Records on File</li>
             </ul>
         @endforelse
@@ -155,12 +158,14 @@
         <div class="profile-details col-auto card mt-3 px-2 div-container " >
              @forelse ($child->getMedical() as $medrecord )
             <ul class="details medical-record mb-3 p-3 border rounded bg-light">
-               
+                <a href="{{ route('delinfo', ['child_id' => $child->id, 'info' => 'MED', 'id' => $medrecord->id]) }}">
+                <i class="fa fa-trash text-danger text-end" style="font-size:1.6em" aria-hidden="true"></i></a>
                 <li><span>Medication:</span> {{$medrecord->allergy}}</li>
                 <li><span>Medication:</span> {{$medrecord->medication}}</li>
                 <li><span>Doctor Name:</span> {{$medrecord->doctorname}}</li>
                 <li><span>Doctor's Contact:</span> {{$medrecord->doctorcontact}}</li>
-                <li><span>Medical Notes</span> {{$medrecord->medicalnote}}</li>  
+                <li><span>Medical Notes</span><a href="#" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-message="{{$medrecord->medicalnote}}">
+                      {{$medrecord->medicalnote}}</a></li>  
             </ul>               
                 @empty
                 <ul>
@@ -178,13 +183,18 @@
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBackgroundModal">
     Add Record
 </button>
-        <div class="profile-details col-auto card mt-3 px-2 div-container ">
-            <ul class="details">
+        <div class="profile-details col-auto card mt-3 px-2 div-container ">       
                 @forelse ($child->getBackground() as $background )
+               <ul class="details medical-record mb-3 p-3 border rounded bg-light">
+                <a href="{{ route('delinfo', ['child_id' => $child->id, 'info' => 'BKG', 'id' => $background->id]) }}">
+                <i class="fa fa-trash text-danger text-end" style="font-size:1.6em" aria-hidden="true"></i></a>
                 <li><span>Name of Previous Gaurdian:</span> {{$background->pguardianname}}</li>
                 <li><span>Contact of Previous Guardian:</span> {{$background->pguardiancontact}}</li>
-                <li><span>Admission Notes</span> {{$background->admissionreason}}</li>                 
+                <li><span>Admission Notes</span><a href="#" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-message="{{$background->admissionreason}}">
+                     {{$background->admissionreason}}</a></li>  
+                </ul>               
                 @empty
+                <ul>
                  <li>No Records on File</li>   
                 @endforelse
             </ul>
@@ -201,10 +211,13 @@
         <div class="profile-details col-auto card mt-3 px-2 div-container ">
             
                 @forelse ($child->getAccomodation() as $accrecord )
-                <ul class="details">
+               <ul class="details medical-record mb-3 p-3 border rounded bg-light">
+                                <a href="{{ route('delinfo', ['child_id' => $child->id, 'info' => 'ACC', 'id' => $background->id]) }}">
+                <i class="fa fa-trash text-danger text-end" style="font-size:1.6em" aria-hidden="true"></i></a>
                 <li><span>Assigned Staff:</span> {{$accrecord->staff_id}}</li>
                 <li><span>Assigned Dormroom:</span> {{$accrecord->dormroom}}</li>
-                <li><span>Accomodation Notes</span> {{$accrecord->accomodationnotes}}</li>     
+                <li><span>Accomodation Notes</span><a href="#" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-message="{{$accrecord->accomodationnotes}}">
+                     {{$accrecord->accomodationnotes}}</a></li>     
                 </ul>            
                 @empty
                 <ul>
@@ -362,7 +375,7 @@
         <form>
           <div class="mb-3">
             <label for="staffId" class="form-label">Assigned Staff</label>
-            <input type="text" class="form-control" id="staffId" name="staffid" placeholder="Enter staff ID or name">
+            <input type="text" class="form-control" id="staffId" name="staff_id" placeholder="Enter staff ID or name">
           </div>
 
           <div class="mb-3">
@@ -377,6 +390,7 @@
       </div>
 
       <div class="modal-footer">
+        <input type="text" name="child_id" value={{$child->id}} hidden>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="submit" class="btn btn-primary" name="addaccomodationrecord">Save Record</button>
       </div>
@@ -389,7 +403,7 @@
 <div class="modal fade" id="addHobbyModal" tabindex="-1" aria-labelledby="addHobbyLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-        <form action="{{route('addbckinfo')}}" method="POST">
+        <form action="{{route('adddevinfo')}}" method="POST">
             @csrf
       <div class="modal-header">
         <h5 class="modal-title" id="addHobbyLabel">Add Hobby</h5>
@@ -415,7 +429,7 @@
 <div class="modal fade" id="addSneedsModal" tabindex="-1" aria-labelledby="addSneedsLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-        <form action="{{route('addbckinfo')}}" method="POST">
+        <form action="{{route('adddevinfo')}}" method="POST">
             @csrf
       <div class="modal-header">
         <h5 class="modal-title" id="addHobbyLabel">Add Special Needs</h5>
@@ -424,10 +438,9 @@
       <div class="modal-body">      
           <div class="mb-3">
             <label for="sneeds" class="form-label">Special Needs</label>
-            <input type="text" class="form-control" id="sneeds" name="sneeds" placeholder="Enter Name of Special Needs">
+            <input type="text" class="form-control" id="sneeds" name="specialneeds" placeholder="Enter Name of Special Needs">
           </div>      
       </div>
-
       <div class="modal-footer">
         <input type="text" name="child_id" value={{$child->id}} hidden>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -437,5 +450,34 @@
     </div>
   </div>
 </div>
+
+<!-- Dynamic Modal -->
+<div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dynamicModalLabel">Message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modalMessage">
+        <!-- Message goes here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+  const modal = document.getElementById('dynamicModal');
+  modal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const message = button.getAttribute('data-message');
+    const modalBody = modal.querySelector('#modalMessage');
+    modalBody.textContent = message;
+  });
+</script>
 
 </x-layouts.app>

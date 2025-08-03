@@ -11,20 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('children', function (Blueprint $table) {
+        Schema::create('staff', function (Blueprint $table) {
             $table->id();
+            $table->integer('userid');
             $table->string('fname');
             $table->string('mname')->nullable();
             $table->string('lname');
-            $table->date('dateofbirth')->nullable();
-            $table->string('gender');
-            $table->string('birthplace')->nullable();
-            $table->integer('nationalityid');
-            $table->string('note')->nullable();
             $table->string('identificationtype')->nullable();
             $table->string('identificationno')->nullable();
-            $table->date('admissiondate')->nullable();
             $table->string('profilephoto')->nullable();
+            $table->string('staffnotes')->nullable();
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('children');
+        Schema::dropIfExists('staff');
     }
 };
