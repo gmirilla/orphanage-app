@@ -13,7 +13,7 @@ return new class extends Migration
     {
       Schema::create('donations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('donor_id')->constrained('donors')->onDelete('cascade');
+            $table->integer('donor_id');
             $table->enum('donation_type', ['cash', 'material', 'service']); // Monetary, In-kind, Services
             $table->decimal('amount', 12, 2)->nullable();
             $table->text('description')->nullable();

@@ -13,7 +13,7 @@ return new class extends Migration
     {
          Schema::create('maintenance_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('facility_id')->constrained('facilities')->onDelete('cascade');
+            $table->integer('facility_id');
             $table->string('title');
             $table->text('description');
             $table->string('priority')->default('medium'); // low, medium, high, urgent
