@@ -14,7 +14,7 @@ return new class extends Migration
       Schema::create('child_room_assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('child_id')->constrained('children')->onDelete('cascade');
-            $table->foreignId('room_allocation_id')->constrained('room_allocations')->onDelete('cascade');
+            $table->integer('room_allocation_id');
             $table->date('assigned_date');
             $table->date('unassigned_date')->nullable();
             $table->text('notes')->nullable();
