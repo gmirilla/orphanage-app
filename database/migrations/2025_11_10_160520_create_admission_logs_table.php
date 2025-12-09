@@ -14,7 +14,7 @@ return new class extends Migration
         // Admission logs
         Schema::create('admission_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('child_id')->constrained('children')->onDelete('cascade');
+            $table->integer('child_id');
             $table->text('intake_record');
             $table->string('source_details');
             $table->json('supporting_documents')->nullable();
