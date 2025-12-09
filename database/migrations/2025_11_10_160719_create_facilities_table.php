@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->integer('capacity')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->foreignId('managed_by')->constrained('users')->onDelete('set null');
+            $table->foreignId('managed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
 
