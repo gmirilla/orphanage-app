@@ -1,3 +1,10 @@
+@php
+    $cwd = getcwd();
+    $cssName = basename(glob($cwd . '/build/assets/*.css')[0], '.css');
+    $jsName = basename(glob($cwd . '/build/assets/*.js')[0], '.js');
+    $css = asset('build/assets/' . $cssName . '.css');
+    $js = asset('build/assets/' . $jsName . '.js');
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
