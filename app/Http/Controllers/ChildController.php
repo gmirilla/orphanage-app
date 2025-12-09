@@ -2,277 +2,293 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\accomodationrecord;
-use App\Models\backgroundrecord;
 use App\Models\Child;
-use App\Models\country;
-use App\Models\Development;
-use App\Models\Education;
-use App\Models\Medicalrecord;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 
 class ChildController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+   public function index(Request $request)
     {
-        //
-        $children=Child::all();
+        $query = Child::with(['admittedBy', 'currentRoomAssignment.roomAllocation.facility']);
 
-        return view('children.listchildren', compact('children'));
-    }
-
-        /**
-     * User clicked the Register new Child button. Begin process of registering new Child
-     */
-    public function registernew()
-    {
-
-        $countries=country::all();
-
-        return view('children.addchild', compact('countries'));
-    }
-
-        /**
-     *  Register/Modify  Child Basic Info.
-     */
-    public function addbasicinfo(Request $request)
-    {
-
-        $child= Child::create($request->all());
-
-
-    //profilepicture do not override if empty
-       if (!empty($request->profilepicture)) {
-        # code...
-        $request->validate(['profilepicture' => 'image|max:4096',]);
-        $fpath=$request->file('profilepicture')->store('profilepictures/children','public');
-        $child->profilephoto=$fpath;
-       }
-
-       $child->save();
-
-
-        return view('children.addchild_education', compact('child'));
-    }
-
-    /**
-     * Add the Education/development info to a child being registered.
-     */
-    public function addeducationinfo(Request $request)
-    {
-        //
-        try {
-            //code...
-            $childeducation=Education::create($request->all());
-            $childdevelopment=Development::create($request->all());
-            $childeducation->save();
-            $childdevelopment->save();
-            $child=Child::where('id',$request->child_id)->first();
-        } catch (\Throwable $th) {
-            //throw $th;
+        // Apply filters
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        if($request->has('addeducationrecord')){
-
-            return view('children.viewchild',compact('child'));
+        if ($request->has('gender')) {
+            $query->where('gender', $request->gender);
         }
 
-        return view('children.addchild_health', compact('child'));
-    }
-    
-    /**
-     * Add the Medical info to a child being registered.
-     */
-    public function addmedicalinfo(Request $request)
-    {
-        //
-        try {
-            //code...
-            $childmedical=Medicalrecord::create($request->all());
-            $childmedical->save();
-            $child=Child::where('id',$request->child_id)->first();
-        } catch (\Throwable $th) {
-            //throw $th;
+        if ($request->has('admission_date_from')) {
+            $query->whereDate('admission_date', '>=', $request->admission_date_from);
         }
 
-        if($request->has('addmedicalrecord')){
-
-            return view('children.viewchild',compact('child'));
+        if ($request->has('admission_date_to')) {
+            $query->whereDate('admission_date', '<=', $request->admission_date_to);
         }
 
-        return redirect()->route('list_children');
-    }
-
-
-        /**
-     * Add the Accomodation  info to a child being registered.
-     */
-    public function addlivinginfo(Request $request)
-    {
-        //
-            //code...
-            $childaccomodation=accomodationrecord::create($request->all());
-            $childaccomodation->save();
-
-        $child=Child::where('id',$request->child_id)->first();
-
-
-        if($request->has('addaccomodationrecord')){
-
-            return view('children.viewchild',compact('child'));
-        }      
-
-        return redirect()->route('list_children');
-
-    }
-
-    
-        /**
-     * Add the Background  info to a child being registered.
-     */
-    public function addbkgrdinfo(Request $request)
-    {
-        //
-        try {
-            //code...
-            $childbackground=backgroundrecord::create($request->all());
-            $childbackground->save();
-            
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-        $child=Child::where('id',$request->child_id)->first();
-        if($request->has('addbackgroundinforecord')){
-
-            return view('children.viewchild',compact('child'));
-        }      
-
-        return redirect()->route('list_children');
-
-    }
-
-        /**
-     * Display the specified resource.
-     */
-    public function viewchild(Request $request)
-    {
-        //
-        $child=Child::where('id', $request->child_id)->first();
-
-        return view('children.viewchild', compact('child'));
-        
-    }
-
-            /**
-     * Add the Development  info to a child being registered.
-     */
-    public function addmiscinfo(Request $request)
-    {
-        //
-        $child=Child::where('id',$request->child_id)->first();
-
-        try {
-            //code...
-
-           $childdevelopment=Development::create($request->all());
-            
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-        
-        $child=Child::where('id',$request->child_id)->first();
-        if($request->has('addmisc')){
-
-            return view('children.viewchild',compact('child'));
-        }      
-
-        return redirect()->route('list_children');
-
-    }
-
-
-    /**
-     * Show the form for deleting individual profile info.
-     */
-    public function deleteprofileinfo(Request $request)
-    {
-        //
-        switch ($request->info) {
-            case 'EDU':
-                # code...
-                Education::destroy($request->id);
-                break;
-            case 'MED':
-                # code...
-                Medicalrecord::destroy($request->id);
-                break;
-            case 'BKG':
-                # code...
-                backgroundrecord::destroy($request->id);
-                break;
-            case 'ACC':
-                # code...
-                accomodationrecord::destroy($request->id);
-                break;         
-            default:
-                # code...
-                break;
+        if ($request->has('status') && $request->status === 'active') {
+            $query->where('is_active', true);
         }
 
-        $child=child::where('id',$request->child_id)->first();
-        return view('children.viewchild', compact('child'));
+        $children = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('children.index', compact('children'));
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Child $child)
     {
-        //
+        $child->load([
+            'admittedBy',
+            'educationHistories',
+            'talentsInterests.recordedBy',
+            'milestones.recordedBy',
+            'currentRoomAssignment.roomAllocation.facility',
+            'documents.uploadedBy'
+        ]);
 
+        return view('children.show', compact('child'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    public function create()
+    {
+        $staff = \App\Models\User::whereIn('role', ['admin', 'caregiver'])->get();
+        return view('children.create', compact('staff'));
+    }
+
+    public function store(Request $request)
+    {
+        $user=Auth::user();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'gender' => 'required|in:male,female,other',
+            'date_of_birth' => 'required|date|before:today',
+            'background_summary' => 'required|string',
+            'admission_date' => 'required|date|after:date_of_birth',
+            'admission_source' => 'required|string',
+            'guardianship_status' => 'nullable|string',
+            'guardian_info' => 'nullable|string',
+            'blood_group' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'height_cm' => 'nullable|numeric|min:0|max:300',
+            'weight_kg' => 'nullable|numeric|min:0|max:200',
+            'special_needs' => 'nullable|string',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'admitted_by' => 'required|exists:users,id'
+        ]);
+
+        $data = $request->all();
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            $photo = $request->file('profile_photo');
+            $filename = 'child_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+            $path = $photo->storeAs('public/profile-photos', $filename);
+            $data['profile_photo'] = str_replace('public/', '', $path);
+        }
+
+        $child = Child::create($data);
+
+        // Create admission log
+        $child->admissionLog()->create([
+            'intake_record' => $request->background_summary,
+            'source_details' => $request->admission_source,
+            'supporting_documents' => [],
+            'medical_history' => [],
+            'social_history' => [],
+            'processed_by' => $user->id
+        ]);
+
+        // Create initial milestone
+        $child->recordMilestone('admission', 'Child Admitted', 
+            "Child admitted on {$request->admission_date} from {$request->admission_source}");
+
+        return redirect()->route('children.show', $child)
+            ->with('success', 'Child profile created successfully.');
+    }
+
     public function edit(Child $child)
     {
-        //
+        $child->load('admissionLog');
+        $staff = \App\Models\User::whereIn('role', ['admin', 'caregiver'])->get();
+        return view('children.edit', compact('child', 'staff'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Child $child)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'gender' => 'required|in:male,female,other',
+            'date_of_birth' => 'required|date|before:today',
+            'background_summary' => 'required|string',
+            'admission_date' => 'required|date|after:date_of_birth',
+            'admission_source' => 'required|string',
+            'guardianship_status' => 'nullable|string',
+            'guardian_info' => 'nullable|string',
+            'blood_group' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'height_cm' => 'nullable|numeric|min:0|max:300',
+            'weight_kg' => 'nullable|numeric|min:0|max:200',
+            'special_needs' => 'nullable|string',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'admitted_by' => 'required|exists:users,id',
+            'is_active' => 'boolean'
+        ]);
+
+        $data = $request->all();
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo
+            if ($child->profile_photo) {
+                Storage::delete('public/' . $child->profile_photo);
+            }
+
+            $photo = $request->file('profile_photo');
+            $filename = 'child_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+            $path = $photo->storeAs('public/profile-photos', $filename);
+            $data['profile_photo'] = str_replace('public/', '', $path);
+        }
+
+        $child->update($data);
+
+        return redirect()->route('children.show', $child)
+            ->with('success', 'Child profile updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Child $child)
     {
-        //
+        // Delete profile photo
+        if ($child->profile_photo) {
+            Storage::delete('public/' . $child->profile_photo);
+        }
+
+        $child->delete();
+
+        return redirect()->route('children.index')
+            ->with('success', 'Child profile deleted successfully.');
+    }
+
+    public function profile(Child $child)
+    {
+        $child->load([
+            'admittedBy',
+            'educationHistories',
+            'talentsInterests.recordedBy',
+            'milestones.recordedBy',
+            'currentRoomAssignment.roomAllocation.facility',
+            'documents.uploadedBy'
+        ]);
+
+        return view('children.profile', compact('child'));
+    }
+
+    public function assignTalent(Request $request, Child $child)
+    {
+        $request->validate([
+            'category' => 'required|in:art,music,sports,academics,technical,social',
+            'talent_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'level' => 'required|in:beginner,intermediate,advanced'
+        ]);
+
+        $child->assignTalent(
+            $request->category,
+            $request->talent_name,
+            $request->description,
+            $request->level
+        );
+
+        return response()->json(['success' => 'Talent assigned successfully.']);
+    }
+
+    public function recordMilestone(Request $request, Child $child)
+    {
+        $request->validate([
+            'type' => 'required|in:growth,achievement,medical,behavioral',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'date_recorded' => 'required|date',
+            'data' => 'nullable|array'
+        ]);
+
+        $child->recordMilestone(
+            $request->type,
+            $request->title,
+            $request->description,
+            $request->data
+        );
+
+        return response()->json(['success' => 'Milestone recorded successfully.']);
+    }
+
+    public function updateMeasurements(Request $request, Child $child)
+    {
+        $request->validate([
+            'height_cm' => 'required|numeric|min:0|max:300',
+            'weight_kg' => 'required|numeric|min:0|max:200'
+        ]);
+
+        $child->updatePhysicalMeasurements($request->height_cm, $request->weight_kg);
+
+        return response()->json(['success' => 'Measurements updated successfully.']);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+        $children = Child::active()
+            ->where('name', 'like', '%' . $query . '%')
+            ->select('id', 'name', 'date_of_birth', 'gender')
+            ->limit(10)
+            ->get();
+
+        return response()->json($children);
+    }
+
+    public function exportProfile(Child $child)
+    {
+        // Generate PDF profile
+        $child->load([
+            'admittedBy',
+            'educationHistories',
+            'talentsInterests.recordedBy',
+            'milestones.recordedBy',
+            'currentRoomAssignment.roomAllocation.facility'
+        ]);
+
+        //$pdf = \PDF::loadView('children.profile-pdf', compact('child'));
+        $filename = "child_profile_{$child->id}_{$child->name}.pdf";
+        
+       // return $pdf->download($filename);
+    }
+
+    public function getStatistics()
+    {
+        $stats = [
+            'total_children' => Child::active()->count(),
+            'children_by_gender' => Child::active()
+                ->selectRaw('gender, COUNT(*) as count')
+                ->groupBy('gender')
+                ->pluck('count', 'gender'),
+            'children_by_age_group' => Child::active()
+                ->selectRaw('
+                    CASE 
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 0 AND 5 THEN "0-5 years"
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 6 AND 10 THEN "6-10 years"
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 11 AND 15 THEN "11-15 years"
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 16 AND 18 THEN "16-18 years"
+                        ELSE "18+ years"
+                    END as age_group,
+                    COUNT(*) as count
+                ')
+                ->groupBy('age_group')
+                ->pluck('count', 'age_group'),
+            'recent_admissions' => Child::where('admission_date', '>=', now()->subMonths(6))->count(),
+        ];
+
+        return response()->json($stats);
     }
 }

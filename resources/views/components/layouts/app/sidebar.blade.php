@@ -1,52 +1,82 @@
 <!DOCTYPE html>
-<style>
-.sidebarcustom {
-    color:black !important;
-    text-decoration: none !important;
-}
-</style>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+    <style>
+        .sidebar-text a{
+            color: #DA9100; /* Tailwind's text-neutral-300 */
+        }
+        .sidebar-text:hover {
+            color: black; /* White on hover */
+        }
+        .daralamah-green {
+            background-color: #324b45; /* Dark green color */
+        }
+    </style>
     <head>
         @include('partials.head')
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-<link rel="stylesheet" href=
-"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-blue-200 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-green-950 sidebar-text">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
-
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse sidebarcustom" wire:navigate>
+            <a href="{{ route('dashboardoms') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
             </a>
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" class="sidebarcustom" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="user-group" class="sidebarcustom" :href="route('list_children')" style="margin-top:8px;">Children</flux:navlist.item>
-                    <flux:navlist.item icon="identification" class="sidebarcustom" :href="route('list_staff')" style="margin-top:8px;">Staff</flux:navlist.item>
-                    <flux:navlist.item icon="building-library" class="sidebarcustom" :href="route('list_rooms')" style="margin-top:8px;">Accomodation/Rooms</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="route('children.index')" :current="request()->routeIs('children.*')" wire:navigate>{{ __('Children') }}</flux:navlist.item>
+                    @if(auth()->user()->isAdmin() || auth()->user()->isCaregiver())
+                    <flux:navlist.item icon="building-library" :href="route('facilities.index')" :current="request()->routeIs('facilities.*')" wire:navigate> {{__('Facilities')}}</flux:navlist.item>
+                    <flux:navlist.item icon="building-library" :href="route('volunteers.index')" :current="request()->routeIs('volunteers.*')" wire:navigate> {{__('Volunteers')}}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->isAdmin() || auth()->user()->isCaregiver())
+                    <flux:navlist.item icon="building-library" :href="route('donors.index')" :current="request()->routeIs('donors.*')" wire:navigate> {{__('Donors')}}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->isAdmin())
+                    <flux:navlist.item icon="user-group" :href="route('staff.index')" :current="request()->routeIs('staff.*')" wire:navigate> {{__('Staff')}}</flux:navlist.item>
+                    @endif
+                    <flux:navlist.item icon="building-library" :href="route('maintenance.index')" :current="request()->routeIs('maintenance.*')" wire:navigate> {{__('Maintenance')}}</flux:navlist.item>
+                    <flux:navlist.item icon="building-library" :href="route('documents.index')" :current="request()->routeIs('documents.*')" wire:navigate> {{__('Documents')}}</flux:navlist.item>
+
+                                    
                     
-                    <!--TO Properly fix a dropdown menu -->
-                    <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-                        <flux:navlist.item icon="map" class="sidebarcustom" :href="route('listcountry')" style="margin-top:8px;">Countries</flux:navlist.item>
-                    </flux:dropdown>
+                    <!-- Navigation -->
+                <nav class="flex-1 px-4 py-6 space-y-2">
+
+                    @if(auth()->user()->isAdmin())
+                    <a href="{{ route('reports.index') }}" 
+                       class="flex items-center px-4 py-3 text-sm font-medium text-neutral-100 hover:bg-primary-700 rounded-lg transition-colors duration-200" 
+                       id="nav-reports">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>
+                        Reports
+                    </a>
+                    @endif
+
+                    @if(auth()->user()->isAdmin())
+                    <a href="#" 
+                       class="flex items-center px-4 py-3 text-sm font-medium text-neutral-100 hover:bg-primary-700 rounded-lg transition-colors duration-200" 
+                       id="nav-settings">
+                        <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                        Settings
+                    </a>
+                    @endif
+                </nav>
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
 
+            <flux:navlist variant="outline">
+                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                {{ __('Repository') }}
+                </flux:navlist.item>
+
+                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+                {{ __('Documentation') }}
+                </flux:navlist.item>
+            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
@@ -54,6 +84,7 @@
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
                     icon:trailing="chevrons-up-down"
+                    data-test="sidebar-menu-button"
                 />
 
                 <flux:menu class="w-[220px]">
@@ -79,14 +110,14 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
                             {{ __('Log Out') }}
                         </flux:menu.item>
                     </form>
@@ -129,14 +160,14 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
                             {{ __('Log Out') }}
                         </flux:menu.item>
                     </form>
