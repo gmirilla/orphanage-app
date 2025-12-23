@@ -6,11 +6,12 @@ use App\Models\Child;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\EducationHistory;
 
 
 class ChildController extends Controller
 {
-   public function index(Request $request)
+    public function index(Request $request)
     {
         $query = Child::with(['admittedBy', 'currentRoomAssignment.roomAllocation.facility']);
 
@@ -62,7 +63,7 @@ class ChildController extends Controller
 
     public function store(Request $request)
     {
-        $user=Auth::user();
+        $user = Auth::user();
         $request->validate([
             'name' => 'required|string|max:255',
             'gender' => 'required|in:male,female,other',
@@ -103,8 +104,11 @@ class ChildController extends Controller
         ]);
 
         // Create initial milestone
-        $child->recordMilestone('admission', 'Child Admitted', 
-            "Child admitted on {$request->admission_date} from {$request->admission_source}");
+        $child->recordMilestone(
+            'admission',
+            'Child Admitted',
+            "Child admitted on {$request->admission_date} from {$request->admission_source}"
+        );
 
         return redirect()->route('children.show', $child)
             ->with('success', 'Child profile created successfully.');
@@ -261,8 +265,8 @@ class ChildController extends Controller
 
         //$pdf = \PDF::loadView('children.profile-pdf', compact('child'));
         $filename = "child_profile_{$child->id}_{$child->name}.pdf";
-        
-       // return $pdf->download($filename);
+
+        // return $pdf->download($filename);
     }
 
     public function getStatistics()
@@ -291,4 +295,49 @@ class ChildController extends Controller
 
         return response()->json($stats);
     }
+
+    public function addEducationRecord(Request $request, Child $child)
+    { 
+        $validated = $request->validate([
+            'school_name' => 'required|string|max:255',
+            'education_level' => 'required|in:primary,secondary,tertiary',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'required|in:enrolled,completed,dropped'
+        ]);
+        try {
+                        //code...
+            $validated['child_id'] = $child->id;
+            $validated['academic_progress'] = $request->academic_progress ??'N/A';
+            EducationHistory::create($validated);
+            return back()->with('sucess', 'Education record added successfully');
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th->getMessage());
+            return back()->with('error', 'Failed to add education record. Please try again.');
+        }
+
+    }
+        public function addMilestone(Request $request, Child $child)
+    {
+        $request->validate([
+            'type' => 'required|in:growth,achievement,medical,developmental',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'data' => 'nullable|array'
+        ]);
+        $date_recorded = $request->date_recorded ?? now()->toDateString();
+    
+
+        $child->recordMilestone(
+            $request->type,
+            $request->title,
+            $request->description,
+            $request->data
+        );
+
+        return back()->with('sucess', 'Education record added successfully');
+    }
+
 }
+

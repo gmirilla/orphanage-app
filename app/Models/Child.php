@@ -186,4 +186,5 @@ class Child extends Model
             'recorded_by' => $user->id,
         ]);
     }
+
 }

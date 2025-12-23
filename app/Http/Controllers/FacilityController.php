@@ -86,7 +86,6 @@ class FacilityController extends Controller
             Facility::create([
                 'name' => $validated['name'],
                 'type' => $validated['type'],
-                'type_error' => $validated['type_typeerror'],
                 'capacity' => $validated['capacity'],
                 'description' => $validated['description'],
                 'managed_by' => $validated['admin_id'],
@@ -110,24 +109,20 @@ class FacilityController extends Controller
      */
     public function show(Facility $facility)
     {
-        $facility->load([
-            'managedBy',
-            'roomAllocations' => function ($query) {
-                $query->withCount('children');
-            },
-            'maintenanceRequests' => function ($query) {
-                $query->orderBy('created_at', 'desc')->limit(10);
-            }
-        ]);
+
+
+        $children=Child::where('facility_id',$facility->id)->get();
+        $maintenanceRequests=MaintenanceRequest::where('facility_id',$facility->id)->get();
+        $roomAllocations=RoomAllocation::where('facility_id',$facility->id)->get();
 
         // Calculate statistics
-        $totalRooms = $facility->roomAllocations->count();
-        $occupiedRooms = $facility->roomAllocations->whereHas('children')->count();
-        $totalOccupancy = $facility->roomAllocations->sum('children_count');
-        $maintenanceRequests = $facility->maintenanceRequests->count();
-        $pendingMaintenance = $facility->maintenanceRequests->where('status', 'pending')->count();
+        $totalRooms = $roomAllocations->count();
+        $occupiedRooms = $roomAllocations->where('occupied_beds', '>', 0)->count();
+        $totalOccupancy = $roomAllocations->sum('children_count');
+        $allmaintenanceRequests = $maintenanceRequests->count();
+        $pendingMaintenance = $maintenanceRequests->where('status', 'pending')->count();
 
-        return view('facilities.show', compact('facility', 'totalRooms', 'occupiedRooms', 'totalOccupancy', 'maintenanceRequests', 'pendingMaintenance'));
+        return view('facilities.show', compact('facility', 'totalRooms', 'occupiedRooms', 'totalOccupancy', 'allmaintenanceRequests', 'pendingMaintenance'));
     }
 
     /**

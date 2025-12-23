@@ -51,5 +51,11 @@ class RoomAllocation extends Model
         if ($this->bed_count == 0) return 0;
         return round(($this->occupied_beds / $this->bed_count) * 100, 1);
     }
+
+    public function children()
+    {
+        $children=Child::where('roomAssignments',$this->id)->get();
+        return $children;
+    }
 }
 

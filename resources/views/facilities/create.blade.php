@@ -12,6 +12,7 @@
       </ul>
   </div>
 @endif
+</div>
 <div class="container">
     <h2>Create New Facility</h2>
 

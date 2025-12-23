@@ -16,6 +16,9 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoomAllocationController;
+use App\Models\RoomAllocation;
+use Termwind\Components\Raw;
 
 Route::get('/', function () {
     return view('welcome');
@@ -62,6 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::post('children/{child}/assign-talent', [ChildController::class, 'assignTalent'])->name('children.assign-talent');
      Route::post('children/{child}/education-record', [ChildController::class, 'addEducationRecord'])->name('children.education-record');
     Route::post('children/{child}/record-milestone', [ChildController::class, 'recordMilestone'])->name('children.record-milestone');
+    Route::post('children/{child}/addmilestone', [ChildController::class, 'addMilestone'])->name('children.addmilestone');
     Route::post('children/{child}/update-measurements', [ChildController::class, 'updateMeasurements'])->name('children.update-measurements');
     Route::get('children/{child}/profile', [ChildController::class, 'profile'])->name('children.profile');
     
@@ -90,6 +94,12 @@ Route::middleware('auth')->group(function () {
     Route::get('facilities/{facility}/show', [FacilityController::class, 'show'])->name('facilities.show');
     Route::get('facilities/{facility}/edit', [FacilityController::class, 'edit'])->name('facilities.edit');
     Route::post('facilities/{facility}/assign-room', [FacilityController::class, 'assignRoom'])->name('facilities.assign-room');
+
+    // Room Allocations Management
+    Route::resource('rooms', \App\Http\Controllers\RoomAllocationController::class);
+    Route::get('rooms', [RoomAllocationController::class, 'index'])->name('rooms.index');
+    Route::post('rooms/store', [RoomAllocationController::class, 'store'])->name('rooms.store');
+    Route::get('rooms/view/{room}', [RoomAllocationController::class, 'view'])->name('rooms.view');
     
     // Maintenance Management
     Route::resource('maintenance', MaintenanceRequestController::class);
