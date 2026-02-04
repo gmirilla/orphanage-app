@@ -28,28 +28,23 @@
     </div>
 
     <!-- Key Information -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- facility Information -->
         <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100">
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">Facility Information</h3>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-sm font-medium text-neutral-600">Facility Name</label>
-                    <p class="text-neutral-900">{{ $facility->name }}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-medium text-neutral-600">Facility Type</label>
-                    <p class="text-neutral-900">{{ ($facility->type) }}</p>
-                </div>
-                
-                <div>
-                    <label class="text-sm font-medium text-neutral-600">Description</label>
-                    <p class="text-neutral-900">{{ $facility->description ?? 'Not specified' }}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-medium text-neutral-600">Capacity</label>
-                    <p class="text-neutral-900">{{ $facility->capacity ?? 'Not recorded' }}</p>
-                </div>
+            <div class="space-y-3 table-responsive">
+                <table class="table-striped table">
+                    <tbody>
+                        <tr><td><b>Facility Name</b></td><td>{{ $facility->name }}</td></tr>
+                        <tr><td><b>Facility Type</b></td><td>{{ ucfirst($facility->type) }}</td></tr>
+                        <tr><td><b>Description</b></td><td>{{ $facility->description ?? 'Not specified' }}</td></tr>
+                        <tr><td><b>Capacity</b></td><td>{{ $facility->capacity ?? 'Not recorded' }}</td></tr>
+                        <tr><td><b>Number  of Rooms</b></td><td>{{ $facility->roomAllocations()->count() }}</td></tr>
+                        <tr><td><b>Occupied Beds</b></td><td>{{ $facility->roomAllocations()->sum('occupied_beds') ?? 0 }}</td></tr>
+                        <tr><td><b>Total Beds</b></td><td>{{ $facility->roomAllocations()->sum('bed_count') ?? 0 }}</td></tr>
+                        <tr><td><b>Pending Maintenance Request:</b></td><td>{{ $pendingMaintenance }}</td></tr>
+                    </tbody>
+                </table>
                 <div>
                     <label class="text-sm font-medium text-neutral-600">Managed By</label>
                     <p class="text-neutral-900">{{ $facility->managedBy->name }}</p>
@@ -58,30 +53,26 @@
         </div>
 
 
-    <!-- Facilities Stats -->
-    <div class="bg-white rounded-lg shadow-md border border-neutral-100">
-        <label class="text-sm font-medium text-neutral-600">Number  of Rooms :</label><p> {{ $facility->roomAllocations()->count() > 0 ? : 0 }} </p>
-         <label class="text-sm font-medium text-neutral-600">Occupancy Rate :</label><p> {{ $totalOccupancy > 0 ? ($occupiedRooms / $totalRooms * 100) : 0 }}% </p>
-         <label class="text-sm font-medium text-neutral-600">Pending Maintenance Request: </label><p>{{ $pendingMaintenance }} </p>
-    </div>
-        <!-- List of Children -->
-    <div class="bg-white rounded-lg shadow-md border border-neutral-100">
+
+        <!-- List of rooms -->
+    <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100" >
         <h3 class="text-lg font-semibold text-neutral-900 mb-4">Rooms in {{ $facility->name }}</h3>
+        <div class="overflow-auto max-h-96">
         @if($facility->roomAllocations->isEmpty())
             <p class="text-neutral-700">No rooms allocated in this facility.</p>
-            <button onclick="window.location='{{ route('rooms.store') }}'" class="btn btn-primary mt-4">
-                Allocate New Room</button>
+
         @else
             <ul class="space-y-2">
-                @foreach($facility->roomAllocations as $room)
+                @foreach($facility->roomAllocations as $roomallocation)
                     <li class="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
                         <div class="flex justify-between items-center">
                             <div>
-                                <h4 class="text-md font-medium text-neutral-900">Room {{ $room->room_number }}</h4>
-                                <p class="text-sm text-neutral-700">Capacity: {{ $room->capacity }}</p>
+                                <h4 class="text-md font-medium text-neutral-900">Room {{ $roomallocation->room_number }}</h4>
+                                <p class="text-sm text-neutral-700">Capacity: {{ $roomallocation->bed_count }}</p>
+                                <p class="text-sm text-neutral-700">Occupied Beds: {{ $roomallocation->occupied_beds ?? 0 }}</p>
                             </div>
                             <div>
-                                <a href="{{ route('rooms.show', $room) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('rooms.view', $roomallocation) }}" class="btn btn-sm btn-primary">
                                     View Details
                                 </a>
                             </div>
@@ -90,7 +81,17 @@
                 @endforeach
             </ul>
         @endif
-      
+
+         </div>
+        <div class="mb-3 text-center">
+                              <form action="{{ route('rooms.create') }}" method="post">
+                @csrf
+                <input type="text" id="facilityid" name="facilityid" hidden value='{{ $facility->id }}'>
+                <button type="submit" class="btn btn-primary mt-4">Allocate New Room</button>
+            </form>
+</div>
+       
+
 
 
     </div>

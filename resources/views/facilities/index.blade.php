@@ -11,7 +11,7 @@
         </div>
         <div class="mt-4 sm:mt-0">
             <a href="{{ route('facilities.create') }}" class="btn btn-primary">
-                <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
+                <i class="fa fa-plus mr-2"></i>
                 Add New Facility
             </a>
         </div>
@@ -53,11 +53,11 @@
             
             <div class="flex items-end space-x-2">
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+                    <i class="fa fa-filter mr-2"></i>
                     Filter
                 </button>
-                <a href="{{ route('facilities.index') }}" class="btn btn-secondary">
-                    <i data-lucide="x" class="w-4 h-4 mr-2"></i>
+                <a href="{{ route('facilities.index') }}" class="btn btn-secondary mx-2">
+                    <i class="fa fa-times mr-2"></i>
                     Clear
                 </a>
             </div>
@@ -72,7 +72,7 @@
                     <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-neutral-600">Total Beds</p>
+                    <p class="text-sm text-neutral-600">Total No of Facilities</p>
                     <p class="text-lg font-semibold text-neutral-900">{{ $facilities->total() }}</p>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                     <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-neutral-600">Recent Admitted</p>
+                    <p class="text-sm text-neutral-600">Recent Admission</p>
                     <p class="text-lg font-semibold text-neutral-900">
                         {{ $facilities->where('admission_date', '>=', now()->subMonths(3))->count() }}
                     </p>

@@ -177,6 +177,8 @@ class ChildController extends Controller
 
     public function profile(Child $child)
     {
+
+
         $child->load([
             'admittedBy',
             'educationHistories',

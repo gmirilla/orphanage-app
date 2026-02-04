@@ -11,7 +11,7 @@
         </div>
         <div class="mt-4 sm:mt-0">
             <a href="{{ route('children.create') }}" class="btn btn-primary">
-                <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
+                <i class="fa fa-plus mr-2"></i>
                 Add New Child
             </a>
         </div>
@@ -50,11 +50,11 @@
             
             <div class="flex items-end space-x-2">
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+                    <i class="fa fa-filter "></i>
                     Filter
                 </button>
-                <a href="{{ route('children.index') }}" class="btn btn-secondary">
-                    <i data-lucide="x" class="w-4 h-4 mr-2"></i>
+                <a href="{{ route('children.index') }}" class="btn btn-secondary ml-3">
+                    <i class="fa fa-times "></i>
                     Clear
                 </a>
             </div>
@@ -66,7 +66,7 @@
         <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
             <div class="flex items-center">
                 <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                    <i  class="fa fa-users text-blue-600"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-neutral-600">Total Children</p>
@@ -78,7 +78,7 @@
         <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
             <div class="flex items-center">
                 <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="user" class="w-5 h-5 text-pink-600"></i>
+                    <i class="fa fa-male text-blue-600"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-neutral-600">Boys</p>
@@ -92,7 +92,7 @@
         <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
             <div class="flex items-center">
                 <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="user-check" class="w-5 h-5 text-purple-600"></i>
+                    <i class="text-purple-600 fa fa-female"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-neutral-600">Girls</p>
@@ -106,7 +106,7 @@
         <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
             <div class="flex items-center">
                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
+                    <i class="fa text-green-600 fa-calendar-check"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-neutral-600">Recent Admitted</p>

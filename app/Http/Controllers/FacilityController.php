@@ -24,31 +24,40 @@ class FacilityController extends Controller
     {
         $query = Facility::query();
 
-        // Apply filters
-        if ($request->has('search')) {
+        // Search filter
+        if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
-        if ($request->has('type') && $request->type) {
+        // Type filter
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('status') && $request->status) {
-            if ($request->status === 'active') {
-                $query->where('is_active', true);
-            } elseif ($request->status === 'inactive') {
-                $query->where('is_active', false);
-            }
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
         }
 
+        // Fetch results
         $facilities = $query->orderBy('name')->paginate(15);
 
-        $types = ['dormitory' => 'Dormitory', 'classroom' => 'Classroom', 'kitchen' => 'Kitchen', 'clinic' => 'Clinic', 'office' => 'Office', 'recreation' => 'Recreation', 'storage' => 'Storage'];
+        // Facility types
+        $types = [
+            'dormitory' => 'dormitory',
+            'classroom' => 'classroom',
+            'kitchen'   => 'kitchen',
+            'clinic'    => 'clinic',
+            'office'    => 'office',
+            'recreation' => 'recreation',
+            'storage'   => 'storage',
+        ];
 
         return view('facilities.index', compact('facilities', 'types'));
     }
@@ -69,7 +78,7 @@ class FacilityController extends Controller
     public function store(Request $request)
     {
 
-        $user=Auth::user();
+        $user = Auth::user();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:dormitory,classroom,kitchen,clinic,office,recreation,storage',
@@ -91,7 +100,7 @@ class FacilityController extends Controller
                 'managed_by' => $validated['admin_id'],
                 'is_active' => true,
             ]);
-                  
+
 
             DB::commit();
 
@@ -99,8 +108,8 @@ class FacilityController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error creating facility: ' . $e->getMessage());
-              $errormsg = $e->getMessage();
-            return back()->withInput()->with('error', 'Failed to create facility. Please try again.',$errormsg);
+            $errormsg = $e->getMessage();
+            return back()->withInput()->with('error', 'Failed to create facility. Please try again.', $errormsg);
         }
     }
 
@@ -111,9 +120,9 @@ class FacilityController extends Controller
     {
 
 
-        $children=Child::where('facility_id',$facility->id)->get();
-        $maintenanceRequests=MaintenanceRequest::where('facility_id',$facility->id)->get();
-        $roomAllocations=RoomAllocation::where('facility_id',$facility->id)->get();
+        $children = Child::where('facility_id', $facility->id)->get();
+        $maintenanceRequests = MaintenanceRequest::where('facility_id', $facility->id)->get();
+        $roomAllocations = RoomAllocation::where('facility_id', $facility->id)->get();
 
         // Calculate statistics
         $totalRooms = $roomAllocations->count();
@@ -249,8 +258,8 @@ class FacilityController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
 

@@ -22,6 +22,7 @@
         @include('partials.head')
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-green-950 sidebar-text">
@@ -47,43 +48,11 @@
                     <flux:navlist.item icon="building-library" :href="route('maintenance.index')" :current="request()->routeIs('maintenance.*')" wire:navigate> {{__('Maintenance')}}</flux:navlist.item>
                     <flux:navlist.item icon="building-library" :href="route('documents.index')" :current="request()->routeIs('documents.*')" wire:navigate> {{__('Documents')}}</flux:navlist.item>
 
-                                    
-                    
-                    <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 space-y-2">
-
-                    @if(auth()->user()->isAdmin())
-                    <a href="{{ route('reports.index') }}" 
-                       class="flex items-center px-4 py-3 text-sm font-medium text-neutral-100 hover:bg-primary-700 rounded-lg transition-colors duration-200" 
-                       id="nav-reports">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>
-                        Reports
-                    </a>
-                    @endif
-
-                    @if(auth()->user()->isAdmin())
-                    <a href="#" 
-                       class="flex items-center px-4 py-3 text-sm font-medium text-neutral-100 hover:bg-primary-700 rounded-lg transition-colors duration-200" 
-                       id="nav-settings">
-                        <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
-                        Settings
-                    </a>
-                    @endif
-                </nav>
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
 
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">

@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::post('children/{child}/addmilestone', [ChildController::class, 'addMilestone'])->name('children.addmilestone');
     Route::post('children/{child}/update-measurements', [ChildController::class, 'updateMeasurements'])->name('children.update-measurements');
     Route::get('children/{child}/profile', [ChildController::class, 'profile'])->name('children.profile');
+     Route::get('children/{child}/show', [ChildController::class, 'show'])->name('children.show');
     
     // Staff Management (Admin only)
     Route::middleware('role:admin')->group(function () {
@@ -96,10 +97,13 @@ Route::middleware('auth')->group(function () {
     Route::post('facilities/{facility}/assign-room', [FacilityController::class, 'assignRoom'])->name('facilities.assign-room');
 
     // Room Allocations Management
-    Route::resource('rooms', \App\Http\Controllers\RoomAllocationController::class);
+    Route::resource('rooms', RoomAllocationController::class);
     Route::get('rooms', [RoomAllocationController::class, 'index'])->name('rooms.index');
+    Route::post('rooms/create', [RoomAllocationController::class, 'create'])->name('rooms.create');
     Route::post('rooms/store', [RoomAllocationController::class, 'store'])->name('rooms.store');
-    Route::get('rooms/view/{room}', [RoomAllocationController::class, 'view'])->name('rooms.view');
+    Route::post('rooms/assignChild/{roomAllocation}', [RoomAllocationController::class, 'assignChild'])->name('rooms.assignChild');
+    Route::post('rooms/unassignChild', [RoomAllocationController::class, 'unassignChild'])->name('rooms.unassignChild');
+    Route::get('rooms/view/{roomAllocation}', [RoomAllocationController::class, 'show'])->name('rooms.view');
     
     // Maintenance Management
     Route::resource('maintenance', MaintenanceRequestController::class);

@@ -34,6 +34,7 @@ class Facility extends Model
     public function roomAllocations(): HasMany
     {
         return $this->hasMany(RoomAllocation::class, 'facility_id');
+    
     }
 
     public function children(): HasMany

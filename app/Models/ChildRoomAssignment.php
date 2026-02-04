@@ -45,6 +45,12 @@ class ChildRoomAssignment extends Model
     {
         return is_null($this->unassigned_date);
     }
+
+    public function getchild() 
+    {
+        $child=Child::where('id', $this->child_id)->first();
+        return $child ? $child : null;
+    }
 }
 
 
