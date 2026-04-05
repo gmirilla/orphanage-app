@@ -1,19 +1,29 @@
 
-@section('title', 'facility Management')
+@section('title', 'Maintenance Management')
 
 <x-layouts.app>
-<div class="container">
-    <div class="bg-white rounded-lg shadow-md border border-neutral-100">
+            <div>
+  @if ($errors->any())
+  <div class="alert alert-danger">
+      <ul>
+          @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+          @endforeach
+      </ul>
+  </div>
+@endif
+</div>
+<div class="space-y-6">
     <!-- Header with Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-neutral-900">Facility Management</h2>
-            <p class="text-sm text-neutral-600">Manage Facility records</p>
+            <h2 class="text-2xl font-bold text-neutral-900">Maintenance Management</h2>
+            <p class="text-sm text-neutral-600">Manage Maintenance records</p>
         </div>
         <div class="mt-4 sm:mt-0">
-            <a href="{{ route('facilities.create') }}" class="btn btn-primary">
+            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
                 <i class="fa fa-plus mr-2"></i>
-                Add New Facility
+                Add New Request
             </a>
         </div>
     </div>
@@ -32,12 +42,13 @@
             </div>
             
             <div>
-                <label for="type" class="form-label">Facility Type</label>
+                <label for="type" class="form-label"> Priority</label>
                 <select id="type" name="type" class="form-input w-full">
-                    <option value="">All Types</option>
-                    @forelse ($types as $type )
+                    <option value="">All Level</option>
+                    @forelse ($plevels as $type )
                         <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
                     @empty
+                    <option value="" disabled> No types available</option>
                         
                     @endforelse
                 </select>
@@ -74,7 +85,7 @@
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-neutral-600">Total No of Facilities</p>
-                    <p class="text-lg font-semibold text-neutral-900">{{ $facilities->total() }}</p>
+                    <p class="text-lg font-semibold text-neutral-900">{{ $facilities->count() }}</p>
                 </div>
             </div>
         </div>
@@ -122,60 +133,67 @@
         </div>
     </div>
 
-    <!-- facility Table -->
+    <!-- Request Table -->
     <div class="bg-white rounded-lg shadow-md border border-neutral-100">
-        <div class="p-6 border-b border-neutral-200">
-            <h3 class="text-lg font-semibold text-neutral-900">Facility List</h3>
+        <div class="p-6 border-b border-neutral-200 flex justify-between">
+            <h3 class="text-lg font-semibold text-neutral-900">Request List </h3>
+                        <button type="button"  class="btn btn-primary" data-bs-target="#newMaintenanceRequest">
+                <i class="fa fa-plus w-4 h-4 mr-2"></i>
+                Add Maintenance Request
+            </button>
         </div>
         
-        @if($facilities->count() > 0)
+        @if($requests->count() > 0)
         <div class="overflow-x-auto">
+
             <table class="data-table w-full">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Type</th>
                         <th>Description</th>
-                        <th>Capacity</th>
-                        <th>Managed By</th>
+                        <th>Priority</th>
+                        <th>Requested By</th>
+                        <th>Assigned To</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($facilities as $facility)
+                    @foreach($requests as $request)
                     <tr>
                         <td>
                             <div>
-                                <p class="font-medium text-neutral-900">{{ $facility->name }}</p>
-                                <p class="text-sm text-neutral-600">ID: #{{ $facility->id }}</p>
+                                <p class="font-medium text-neutral-900">{{ $request->title }}</p>
+                                <p class="text-sm text-neutral-600">ID: #{{ $request->id }}</p>
                             </div>
                         </td>
-                        <td>{{ $facility->type }}</td>
-                        <td>{{ $facility->description }}</td>
-                        <td>{{ $facility->capacity }}</td>
-                        <td>{{ $facility->managedBy->name }}</td>
+                        <td>{{ $request->facility->type }}</td>
+                        <td>{{ $request->description }}</td>
+                        <td>{{ ucfirst($request->priority) }}</td>
+                        <td>{{ $request->requestedBy->name }}</td>
+                        <td>{{ $request->assignedTo->name ?? 'Unassigned'}}</td>
                         <td>
-                            @if($facility->is_active)
-                                <span class="badge badge-success">Active</span>
+                            @if($request->status =='completed')
+                                <span class="badge badge-success">{{ucfirst($request->status)}}</span>
                             @else
-                                <span class="badge badge-danger">Inactive</span>
+                                <span class="badge badge-warning">{{ucfirst($request->status)}} </span>
                             @endif
                         </td>
                         <td>
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('facilities.show', $facility) }}" 
+                                <a href="{{ route('maintenance.view', $request) }}" 
                                    class="p-1 btn btn-primary"
                                    title="View Profile">View
                                 </a>
-                                <a href="{{ route('facilities.edit', $facility) }}" 
+                                <a href="{{ route('maintenance.edit_request', $request) }}" 
                                 class="p-1 btn btn-success"
                                    title="Edit">Edit
                                     <i data-lucide="edit" class="w-4 h-4"></i>
                                 </a>
                                 <button class="p-1 btn btn-danger"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    data-bs-toDelete="{{$facility->id}}"
+                                    data-bs-toDelete="{{$request->id}}"
                                         title="Delete">Delete
                                 </button>
                             </div>
@@ -185,20 +203,15 @@
                 </tbody>
             </table>
         </div>
-        
-        <!-- Pagination -->
-        <div class="p-6 border-t border-neutral-200">
-            {{ $facilities->links() }}
-        </div>
         @else
         <div class="p-12 text-center">
             <i data-lucide="users" class="w-16 h-16 text-neutral-400 mx-auto mb-4"></i>
-            <h3 class="text-lg font-medium text-neutral-900 mb-2">No facility found</h3>
-            <p class="text-neutral-600 mb-6">Get started by adding the first Facility.</p>
-            <a href="{{ route('facilities.create') }}" class="btn btn-primary">
-                <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
-                Add Facility
-            </a>
+            <h3 class="text-lg font-medium text-neutral-900 mb-2">No Maintenance Request found</h3>
+            <p class="text-neutral-600 mb-6">Get started by adding the first Maintenance Request.</p>
+            <button type="button"  class="btn btn-primary" data-bs-target="#newMaintenanceRequest">
+                <i class="fa fa-plusw-4 h-4 mr-2"></i>
+                Add Maintenance Request
+            </button>
         </div>
         @endif
     </div>
@@ -223,6 +236,27 @@
                 </div>
                 </div>
 </div>
+
+
+
+<!-- New Maintenance Request Modal -->
+<div class="modal fade" id="newMaintenanceRequest" tabindex="-1" aria-labelledby="newMaintenanceRequestLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">New Maintenance Request
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-neutral-600 mb-6">Are you sure you want to delete this record ? <br/>
+                            <span id="facilityName" class="font-medium"></span>This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="flex justify-end space-x-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button onclick="deleteFacility()" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
 </div>
 
 
@@ -238,26 +272,13 @@ deleteModal.addEventListener('show.bs.modal', function(event) {
 });
 
 function confirmDelete(childId, childName) {
-    //childToDelete = childId;
-    document.getElementById('childName').textContent = childName;
-    document.getElementById('deleteModal').classList.remove('hidden');
+
 }
 
 
 function deleteFacility() {
     if (!childToDelete) return;
     
-    // Create a form to submit the DELETE request
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/facility/${childToDelete}`;
-    form.innerHTML = `
-        @csrf
-        @method('DELETE')
-    `;
-    
-    document.body.appendChild(form);
-    form.submit();
 }
 
 // Close modal when clicking outside

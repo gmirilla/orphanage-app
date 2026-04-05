@@ -2,7 +2,7 @@
 @section('title', 'Add New Child')
 
 <x-layouts.app>
-<div class="max-w-4xl mx-auto">
+<div class="container">
     <div class="bg-white rounded-lg shadow-md border border-neutral-100">
         <div class="p-6 border-b border-neutral-200">
             <h1 class="text-2xl font-bold text-neutral-900">Add New Child</h1>

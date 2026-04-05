@@ -14,6 +14,8 @@
 @endif
 </div>
 <div class="container">
+    <div class="bg-white rounded-lg shadow-md border border-neutral-100">
+
     <h2>Create New Facility</h2>
 
     <form action="{{ route('facilities.store') }}" method="POST">
@@ -79,6 +81,7 @@
         <!-- Submit Button -->
         <button type="submit" class="btn btn-primary">Create Facility</button>
     </form>
+</div>
 </div>
 
 </x-layouts.app>

@@ -12,7 +12,7 @@
             </div>
         @endif
     </div>
-    <div class="space-y-6">
+    <div class="container>
         <!-- Header -->
         <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100">
             <div class="flex items-center space-x-6">

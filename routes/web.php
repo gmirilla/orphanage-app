@@ -52,41 +52,41 @@ Route::middleware(['auth'])->group(function () {
 
 // Protected routes
 Route::middleware('auth')->group(function () {
-     // Dashboard
+    // Dashboard
     Route::get('/dashboardoms', [DashboardController::class, 'index'])->name('dashboardoms');
     Route::get('/dashboardoms2', [DashboardController::class, 'index']);
-    
+
     // API routes for dashboard
     Route::get('/api/analytics', [DashboardController::class, 'getAnalytics'])->name('analytics');
     Route::get('/api/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.api');
-    
+
     // Children Management
     Route::resource('children', ChildController::class);
     Route::post('children/{child}/assign-talent', [ChildController::class, 'assignTalent'])->name('children.assign-talent');
-     Route::post('children/{child}/education-record', [ChildController::class, 'addEducationRecord'])->name('children.education-record');
+    Route::post('children/{child}/education-record', [ChildController::class, 'addEducationRecord'])->name('children.education-record');
     Route::post('children/{child}/record-milestone', [ChildController::class, 'recordMilestone'])->name('children.record-milestone');
     Route::post('children/{child}/addmilestone', [ChildController::class, 'addMilestone'])->name('children.addmilestone');
     Route::post('children/{child}/update-measurements', [ChildController::class, 'updateMeasurements'])->name('children.update-measurements');
     Route::get('children/{child}/profile', [ChildController::class, 'profile'])->name('children.profile');
-     Route::get('children/{child}/show', [ChildController::class, 'show'])->name('children.show');
-    
+    Route::get('children/{child}/show', [ChildController::class, 'show'])->name('children.show');
+
     // Staff Management (Admin only)
     Route::middleware('role:admin')->group(function () {
         Route::resource('staff', StaffController::class);
         Route::post('staff/{staff}/schedule-shift', [StaffController::class, 'scheduleShift'])->name('staff.schedule-shift');
         Route::get('staff/{staff}/shifts', [StaffController::class, 'showShifts'])->name('staff.shifts');
     });
-    
+
     // Volunteers Management
     Route::resource('volunteers', VolunteerController::class);
     Route::post('volunteers/{volunteer}/approve', [VolunteerController::class, 'approve'])->name('volunteers.approve');
     Route::post('volunteers/{volunteer}/assign-task', [VolunteerController::class, 'assignTask'])->name('volunteers.assign-task');
-    
+
     // Donors Management
     Route::resource('donors', DonorController::class);
     Route::post('donors/{donor}/add-donation', [DonorController::class, 'addDonation'])->name('donors.add-donation');
     Route::get('donors/{donor}/donation-history', [DonorController::class, 'donationHistory'])->name('donors.donation-history');
-    
+
     // Facilities Management
     Route::resource('facilities', FacilityController::class);
     Route::get('facilities/{facility}/rooms', [FacilityController::class, 'rooms'])->name('facilities.rooms');
@@ -97,19 +97,22 @@ Route::middleware('auth')->group(function () {
     Route::post('facilities/{facility}/assign-room', [FacilityController::class, 'assignRoom'])->name('facilities.assign-room');
 
     // Room Allocations Management
-    Route::resource('rooms', RoomAllocationController::class);
     Route::get('rooms', [RoomAllocationController::class, 'index'])->name('rooms.index');
     Route::post('rooms/create', [RoomAllocationController::class, 'create'])->name('rooms.create');
     Route::post('rooms/store', [RoomAllocationController::class, 'store'])->name('rooms.store');
     Route::post('rooms/assignChild/{roomAllocation}', [RoomAllocationController::class, 'assignChild'])->name('rooms.assignChild');
     Route::post('rooms/unassignChild', [RoomAllocationController::class, 'unassignChild'])->name('rooms.unassignChild');
     Route::get('rooms/view/{roomAllocation}', [RoomAllocationController::class, 'show'])->name('rooms.view');
-    
+
     // Maintenance Management
     Route::resource('maintenance', MaintenanceRequestController::class);
-    Route::post('maintenance/{maintenance}/update-status', [MaintenanceRequestController::class, 'updateStatus'])->name('maintenance.update-status');
-    Route::post('maintenance/{maintenance}/assign', [MaintenanceRequestController::class, 'assign'])->name('maintenance.assign');
-    
+    Route::post('maintenance/update_status/{maintenanceRequest}', [MaintenanceRequestController::class, 'updateStatus'])->name('maintenance.update_status');
+    Route::post('maintenance/assign/{maintenance}', [MaintenanceRequestController::class, 'assign'])->name('maintenance.assign');
+    Route::post('maintenance/new', [MaintenanceRequestController::class, 'newRequest'])->name('maintenance.new');
+    Route::get('maintenance/view/', [MaintenanceRequestController::class, 'index'])->name('maintenance.index');
+    Route::get('maintenance/edit_request/{maintenanceRequest}', [MaintenanceRequestController::class, 'editRequest'])->name('maintenance.edit_request');
+    Route::get('maintenance/view_request/{maintenanceRequest}', [MaintenanceRequestController::class, 'view'])->name('maintenance.view');
+
     // Documents Management
     Route::resource('documents', DocumentController::class);
     Route::post('documents/upload', [DocumentController::class, 'upload'])->name('documents.upload');
@@ -126,12 +129,12 @@ Route::middleware('auth')->group(function () {
         Route::get('reports/facilities', [ReportController::class, 'facilitiesReport'])->name('reports.facilities');
         Route::get('reports/maintenance', [ReportController::class, 'maintenanceReport'])->name('reports.maintenance');
         Route::post('reports/export', [ReportController::class, 'export'])->name('reports.export');
-        
+
         // PDF Export routes
         Route::get('reports/children/{child}/pdf', [\App\Http\Controllers\ReportController::class, 'exportChildProfile'])->name('reports.child-profile-pdf');
         Route::get('reports/donations/{donor}/pdf', [\App\Http\Controllers\ReportController::class, 'exportDonorReport'])->name('reports.donor-pdf');
     });
-           /**
+    /**
 
     // Settings (Admin only)
     Route::middleware('role:admin')->group(function () {
@@ -141,16 +144,16 @@ Route::middleware('auth')->group(function () {
         Route::post('settings/backup', [SettingsController::class, 'createBackup'])->name('settings.backup');
     });
 
-    */
-  
+     */
+
     // Profile Management
     Route::get('profile', [UserController::class, 'show'])->name('profile.show');
     Route::put('profile', [UserController::class, 'update'])->name('profile.update');
     Route::put('profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
     Route::put('profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.avatar');
 
-  
-    
+
+
     // API routes
     Route::prefix('api')->name('api.')->group(function () {
         Route::get('children/search', [ChildController::class, 'search'])->name('children.search');
@@ -167,5 +170,4 @@ Route::middleware('auth')->group(function () {
 Route::view('unauthorized', 'errors.unauthorized')->name('unauthorized');
 Route::view('404', 'errors.404')->name('404');
 Route::view('500', 'errors.500')->name('500');
-Route::view('/','welcome')->name('home');
-
+Route::view('/', 'welcome')->name('home');
