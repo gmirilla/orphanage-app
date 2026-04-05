@@ -24,7 +24,7 @@
         <!-- Facility Name -->
         <div class="mb-3">
             <label for="name" class="form-label" required>Facility Name</label>
-            <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>
+            <input type="text" name="name" id="name" class="form-input" value="{{ old('name') }}" required>
             @error('name')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
@@ -33,7 +33,7 @@
         <!-- Facility Type -->
         <div class="mb-3">
             <label for="type" class="form-label">Facility Type</label>
-            <select name="type" id="type" class="form-select" required>
+            <select name="type" id="type" class="form-input" required>
                 <option value="">-- Select Type --</option>
                 @foreach($types as $key => $label)
                     <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -47,7 +47,7 @@
         <!-- Assigned Admin -->
         <div class="mb-3">
             <label for="admin_id" class="form-label">Assign Admin</label>
-            <select name="admin_id" id="admin_id" class="form-select" required>
+            <select name="admin_id" id="admin_id" class="form-input" required>
                 <option value="">-- Select Admin --</option>
                 @foreach($admins as $admin)
                     <option value="{{ $admin->id }}" {{ old('admin_id') == $admin->id ? 'selected' : '' }}>
@@ -63,7 +63,7 @@
         <!-- Location -->
         <div class="mb-3">
             <label for="description" class="form-label">Description/Location</label>
-            <input type="text" name="description" id="description" class="form-control" value="{{ old('description') }}">
+            <input type="text" name="description" id="description" class="form-input" value="{{ old('description') }}">
             @error('description')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
@@ -72,7 +72,7 @@
         <!-- Capacity -->
         <div class="mb-3">
             <label for="capacity" class="form-label">Capacity</label>
-            <input type="number" name="capacity" id="capacity" class="form-control" value="{{ old('capacity') }}">
+            <input type="number" name="capacity" id="capacity" class="form-input" value="{{ old('capacity') }}">
             @error('capacity')
                 <div class="text-danger">{{ $message }}</div>
             @enderror

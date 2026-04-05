@@ -137,10 +137,10 @@
     <div class="bg-white rounded-lg shadow-md border border-neutral-100">
         <div class="p-6 border-b border-neutral-200 flex justify-between">
             <h3 class="text-lg font-semibold text-neutral-900">Request List </h3>
-                        <button type="button"  class="btn btn-primary" data-bs-target="#newMaintenanceRequest">
-                <i class="fa fa-plus w-4 h-4 mr-2"></i>
+            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i>
                 Add Maintenance Request
-            </button>
+            </a>
         </div>
         
         @if($requests->count() > 0)
@@ -191,10 +191,8 @@
                                    title="Edit">Edit
                                     <i data-lucide="edit" class="w-4 h-4"></i>
                                 </a>
-                                <button class="p-1 btn btn-danger"
-                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    data-bs-toDelete="{{$request->id}}"
-                                        title="Delete">Delete
+                                <button onclick="confirmDelete({{ $request->id }}, '{{ addslashes($request->title) }}')"
+                                        class="p-1 btn btn-danger" title="Delete">Delete
                                 </button>
                             </div>
                         </td>
@@ -208,84 +206,60 @@
             <i data-lucide="users" class="w-16 h-16 text-neutral-400 mx-auto mb-4"></i>
             <h3 class="text-lg font-medium text-neutral-900 mb-2">No Maintenance Request found</h3>
             <p class="text-neutral-600 mb-6">Get started by adding the first Maintenance Request.</p>
-            <button type="button"  class="btn btn-primary" data-bs-target="#newMaintenanceRequest">
-                <i class="fa fa-plusw-4 h-4 mr-2"></i>
+            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i>
                 Add Maintenance Request
-            </button>
+            </a>
         </div>
         @endif
     </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">Confirm Deletion
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-neutral-600 mb-6">Are you sure you want to delete this record ? <br/>
-                            <span id="facilityName" class="font-medium"></span>This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="flex justify-end space-x-3">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button onclick="deleteFacility()" class="btn btn-danger">Delete</button>
-                        </div>
-                    </div>
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+                    <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
                 </div>
-                </div>
+                <h3 class="text-lg font-semibold text-zinc-900">Delete Maintenance Request</h3>
+            </div>
+            <p class="text-zinc-600 text-sm">Are you sure you want to delete <span id="requestName" class="font-semibold text-zinc-900"></span>? This action cannot be undone.</p>
+        </div>
+        <div class="flex justify-end gap-3 px-6 pb-6">
+            <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+            <button onclick="deleteRequest()" class="btn btn-danger">Delete</button>
+        </div>
+    </div>
 </div>
-
-
-
-<!-- New Maintenance Request Modal -->
-<div class="modal fade" id="newMaintenanceRequest" tabindex="-1" aria-labelledby="newMaintenanceRequestLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">New Maintenance Request
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-neutral-600 mb-6">Are you sure you want to delete this record ? <br/>
-                            <span id="facilityName" class="font-medium"></span>This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="flex justify-end space-x-3">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button onclick="deleteFacility()" class="btn btn-danger">Delete</button>
-                        </div>
-                    </div>
-                </div>
-                </div>
-</div>
-
 
 <script>
-var childToDelete = null;
-var deleteModal = document.getElementById('deleteModal')
-deleteModal.addEventListener('show.bs.modal', function(event) {
-                    // Button that triggered the modal
-                var button = event.relatedTarget
-                // Extract info from data-bs-* attributes
-                var childToDeleteID = button.getAttribute('data-bs-toDelete')
-                childToDelete = childToDeleteID;
-});
+let requestToDelete = null;
 
-function confirmDelete(childId, childName) {
-
+function confirmDelete(requestId, requestName) {
+    requestToDelete = requestId;
+    document.getElementById('requestName').textContent = requestName;
+    document.getElementById('deleteModal').classList.remove('hidden');
 }
 
-
-function deleteFacility() {
-    if (!childToDelete) return;
-    
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    requestToDelete = null;
 }
 
-// Close modal when clicking outside
+function deleteRequest() {
+    if (!requestToDelete) return;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/maintenance/${requestToDelete}`;
+    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
+    document.body.appendChild(form);
+    form.submit();
+}
+
 document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
+    if (e.target === this) closeDeleteModal();
 });
 </script>
 </x-layouts.app>

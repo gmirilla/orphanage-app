@@ -31,7 +31,7 @@ class FacilityController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('type', 'like', "%{$search}%")
-                    ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -152,15 +152,8 @@ class FacilityController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:dormitory,classroom,kitchen,clinic,office,recreation,storage',
-            'location' => 'nullable|string|max:255',
             'capacity' => 'nullable|integer|min:0',
-            'area' => 'nullable|numeric|min:0',
-            'condition' => 'nullable|in:excellent,good,fair,poor',
-            'construction_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
-            'last_maintenance' => 'nullable|date',
-            'next_maintenance' => 'nullable|date',
             'description' => 'nullable|string',
-            'notes' => 'nullable|string',
             'is_active' => 'required|boolean',
         ]);
 
@@ -259,7 +252,7 @@ class FacilityController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('type', 'like', "%{$search}%")
-                    ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 

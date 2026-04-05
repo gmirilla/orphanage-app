@@ -32,7 +32,7 @@
                             <label for="name" class="form-label">Full Name <span
                                     class="text-red-500">*</span></label>
                             <input type="text" id="name" name="name" value="{{ $child->name }}" required
-                                class="form-control @error('name') border-red-500 @enderror w-full">
+                                class="form-input @error('name') border-red-500 @enderror w-full">
                             @error('name')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
@@ -43,7 +43,7 @@
                                 Gender <span class="text-red-500">*</span>
                             </label>
                             <select id="gender" name="gender" required
-                                class="form-select @error('gender') border-red-500 @enderror w-full">
+                                class="form-input @error('gender') border-red-500 @enderror w-full">
                                 <option value="" disabled {{ !$child->gender ? 'selected' : '' }}>Select Gender
                                 </option>
                                 <option value="male" {{ old('gender', $child->gender) === 'male' ? 'selected' : '' }}>
@@ -66,7 +66,7 @@
                             <input type="date" id="date_of_birth" name="date_of_birth"
                                 value="{{ old('date_of_birth', optional($child)->date_of_birth ? \Carbon\Carbon::parse($child->date_of_birth)->format('Y-m-d') : '') }}"
                                 required max="{{ now()->format('Y-m-d') }}"
-                                class="form-control w-full @error('date_of_birth') border-red-500 @enderror">
+                                class="form-input w-full @error('date_of_birth') border-red-500 @enderror">
                             @error('date_of_birth')
                                 <p class="error-message text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -76,7 +76,7 @@
                         <div>
                             <label for="blood_group" class="form-label">Blood Group</label>
                             <select id="blood_group" name="blood_group"
-                                class="form-select @error('blood_group') border-red-500 @enderror w-full">
+                                class="form-input @error('blood_group') border-red-500 @enderror w-full">
                                 <option value="" disabled {{ !$child->blood_group ? 'selected' : '' }}>Select Blood Group</option>
                                 <option value="A+" {{ old('blood_group', $child->blood_group) === 'A+' ? 'selected' : '' }}>A+</option>
                                 <option value="A-" {{ old('blood_group', $child->blood_group) === 'A-' ? 'selected' : '' }}>A-</option>
@@ -98,7 +98,7 @@
                             <label for="height_cm" class="form-label">Height (cm)</label>
                             <input type="number" id="height_cm" name="height_cm" value="{{ old('height_cm', $child->height_cm) }}"
                                 step="0.1" min="0" max="300"
-                                class="form-control @error('height_cm') border-red-500 @enderror w-full">
+                                class="form-input @error('height_cm') border-red-500 @enderror w-full">
                             @error('height_cm')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
@@ -108,7 +108,7 @@
                             <label for="weight_kg" class="form-label">Weight (kg)</label>
                             <input type="number" id="weight_kg" name="weight_kg" value="{{ old('weight_kg', $child->weight_kg) }}"
                                 step="0.1" min="0" max="200"
-                                class="form-control @error('weight_kg') border-red-500 @enderror w-full">
+                                class="form-input @error('weight_kg') border-red-500 @enderror w-full">
                             @error('weight_kg')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
@@ -117,7 +117,7 @@
                         <div class="md:col-span-2">
                             <label for="profile_photo" class="form-label">Profile Photo</label>
                             <input type="file" id="profile_photo" name="profile_photo" accept="image/*"
-                                class="form-control @error('profile_photo') border-red-500 @enderror w-full">
+                                class="form-input @error('profile_photo') border-red-500 @enderror w-full">
                             <p class="text-sm text-neutral-600 mt-1">Upload a clear photo (JPEG, PNG, JPG, GIF - max
                                 2MB)</p>
                             @error('profile_photo')
@@ -136,7 +136,7 @@
                                     class="text-red-500">*</span></label>
                             <input type="date" id="admission_date" name="admission_date"
                                 value="{{ old('admission_date',optional($child)->admission_date ? \Carbon\Carbon::parse($child->admission_date)->format('Y-m-d') : '') }}" required
-                                class="form-control @error('admission_date') border-red-500 @enderror w-full">
+                                class="form-input @error('admission_date') border-red-500 @enderror w-full">
                             @error('admission_date')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
@@ -146,7 +146,7 @@
                             <label for="admission_source" class="form-label">Admission Source <span
                                     class="text-red-500">*</span></label>
                             <select id="admission_source" name="admission_source" required
-                                class="form-select @error('admission_source') border-red-500 @enderror w-full">
+                                class="form-input @error('admission_source') border-red-500 @enderror w-full">
                                 <option value="" disabled {{ !$child->admission_source ? 'selected' : '' }}>Select Source</option>
                                 <option value="hospital"
                                     {{ old('admission_source', $child->admission_source) === 'hospital' ? 'selected' : '' }}>Hospital</option>
@@ -169,7 +169,7 @@
                         <div>
                             <label for="guardianship_status" class="form-label">Guardianship Status</label>
                             <select id="guardianship_status" name="guardianship_status"
-                                class="form-select @error('guardianship_status') border-red-500 @enderror w-full">
+                                class="form-input @error('guardianship_status') border-red-500 @enderror w-full">
                                 <option value="" disabled {{ !$child->guardianship_status ? 'selected' : '' }}>Select Status</option>
                                 <option value="orphan"
                                     {{ old('guardianship_status', $child->guardianship_status) === 'orphan' ? 'selected' : '' }}>Orphan</option>
@@ -192,7 +192,7 @@
                             <label for="admitted_by" class="form-label">Admitted By <span
                                     class="text-red-500">*</span></label>
                             <select id="admitted_by" name="admitted_by" required
-                                class="form-select @error('admitted_by') border-red-500 @enderror w-full">
+                                class="form-input @error('admitted_by') border-red-500 @enderror w-full">
                                 <option value="" disabled {{ !$child->admitted_by ? 'selected' : '' }}>Select Staff Member</option>
                                 @foreach ($staff as $member)
                                     <option value="{{ $member->id }}"
@@ -217,7 +217,7 @@
                                     class="text-red-500">*</span></label>
                             <textarea id="background_summary" name="background_summary" rows="4" required
                                 placeholder="Provide a comprehensive background summary including family situation, circumstances leading to admission, and any relevant history..."
-                                class="form-control @error('background_summary') border-red-500 @enderror w-full">{{ old('background_summary', $child->background_summary) }}</textarea>
+                                class="form-input @error('background_summary') border-red-500 @enderror w-full">{{ old('background_summary', $child->background_summary) }}</textarea>
                             @error('background_summary')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
@@ -227,7 +227,7 @@
                             <label for="special_needs" class="form-label">Special Needs</label>
                             <textarea id="special_needs" name="special_needs" rows="3"
                                 placeholder="Any special medical, educational, or behavioral needs..."
-                                class="form-control @error('special_needs') border-red-500 @enderror w-full">{{ old('special_needs', $child->special_needs) }}</textarea>
+                                class="form-input @error('special_needs') border-red-500 @enderror w-full">{{ old('special_needs', $child->special_needs) }}</textarea>
                             @error('special_needs')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
@@ -237,7 +237,7 @@
                             <label for="guardian_info" class="form-label">Guardian Information</label>
                             <textarea id="guardian_info" name="guardian_info" rows="3"
                                 placeholder="Information about parents, guardians, or next of kin (if applicable)..."
-                                class="form-control @error('guardian_info') border-red-500 @enderror w-full">{{ old('guardian_info', $child->guardian_info) }}</textarea>
+                                class="form-input @error('guardian_info') border-red-500 @enderror w-full">{{ old('guardian_info', $child->guardian_info) }}</textarea>
                             @error('guardian_info')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror

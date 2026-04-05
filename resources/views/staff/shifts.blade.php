@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Shift Schedule - ' . $staff->name)
-
-@section('content')
+<x-layouts.app>
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -296,13 +292,10 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
 let editingShiftId = null;
 
 function editShift(shiftId) {
-    // Fetch shift data and populate modal
-    // This would typically involve an AJAX call to get the shift details
     editingShiftId = shiftId;
     document.getElementById('editShiftModal').classList.remove('hidden');
 }
@@ -314,26 +307,18 @@ function closeEditShiftModal() {
 
 function updateShiftStatus(shiftId, status) {
     if (!status) return;
-    
-    // Create a form to submit the status update
+
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/shifts/${shiftId}/status`;
-    form.innerHTML = `
-        @csrf
-        <input type="hidden" name="status" value="${status}">
-    `;
-    
+    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">'
+                   + '<input type="hidden" name="status" value="' + status + '">';
     document.body.appendChild(form);
     form.submit();
 }
 
-// Close modal when clicking outside
 document.getElementById('editShiftModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeEditShiftModal();
-    }
+    if (e.target === this) closeEditShiftModal();
 });
 </script>
-@endpush
-@endsection
+</x-layouts.app>

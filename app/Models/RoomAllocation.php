@@ -54,8 +54,14 @@ class RoomAllocation extends Model
 
     public function children()
     {
-        $children=Child::where('roomAssignments',$this->id)->get();
-        return $children;
+        return $this->hasManyThrough(
+            Child::class,
+            ChildRoomAssignment::class,
+            'room_allocation_id',
+            'id',
+            'id',
+            'child_id'
+        )->whereNull('child_room_assignments.unassigned_date');
     }
 }
 

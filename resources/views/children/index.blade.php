@@ -196,10 +196,8 @@
                                    title="Edit">Edit
                                     <i data-lucide="edit" class="w-4 h-4"></i>
                                 </a>
-                                <button class="p-1 btn btn-danger"
-                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    data-bs-toDelete="{{$child->id}}"
-                                        title="Delete">Delete
+                                <button onclick="confirmDelete({{ $child->id }}, '{{ addslashes($child->name) }}')"
+                                        class="p-1 btn btn-danger" title="Delete">Delete
                                 </button>
                             </div>
                         </td>
@@ -228,65 +226,50 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">Confirm Deletion
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-neutral-600 mb-6">Are you sure you want to delete this record ? <br/>
-                            <span id="childName" class="font-medium"></span>This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="flex justify-end space-x-3">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button onclick="deleteChild()" class="btn btn-danger">Delete</button>
-                        </div>
-                    </div>
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+                    <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
                 </div>
-                </div>
+                <h3 class="text-lg font-semibold text-zinc-900">Delete Child Record</h3>
+            </div>
+            <p class="text-zinc-600 text-sm">Are you sure you want to delete <span id="childName" class="font-semibold text-zinc-900"></span>? This action cannot be undone.</p>
+        </div>
+        <div class="flex justify-end gap-3 px-6 pb-6">
+            <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+            <button onclick="deleteChild()" class="btn btn-danger">Delete</button>
+        </div>
+    </div>
 </div>
 
-
 <script>
-var childToDelete = null;
-var deleteModal = document.getElementById('deleteModal')
-deleteModal.addEventListener('show.bs.modal', function(event) {
-                    // Button that triggered the modal
-                var button = event.relatedTarget
-                // Extract info from data-bs-* attributes
-                var childToDeleteID = button.getAttribute('data-bs-toDelete')
-                childToDelete = childToDeleteID;
-});
+let childToDelete = null;
 
 function confirmDelete(childId, childName) {
-    //childToDelete = childId;
+    childToDelete = childId;
     document.getElementById('childName').textContent = childName;
     document.getElementById('deleteModal').classList.remove('hidden');
 }
 
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    childToDelete = null;
+}
 
 function deleteChild() {
     if (!childToDelete) return;
-    
-    // Create a form to submit the DELETE request
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/children/${childToDelete}`;
-    form.innerHTML = `
-        @csrf
-        @method('DELETE')
-    `;
-    
+    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
     document.body.appendChild(form);
     form.submit();
 }
 
-// Close modal when clicking outside
 document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
+    if (e.target === this) closeDeleteModal();
 });
 </script>
 </x-layouts.app>

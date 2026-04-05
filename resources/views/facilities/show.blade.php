@@ -44,9 +44,8 @@
             <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100">
                 <div class="flex justify-between">
                     <h3 class="text-lg font-semibold text-neutral-900 mb-4">Facility Information</h3>
-                    <div><button type="button" data-bs-toggle="modal" data-bs-target="#maintenanceRequestModal"
-                            data-bs-whatever="" class="btn btn-sm btn-primary">
-                            <i class="fa fa-plus mr-2"></i>Maintenance Request</button></div>
+                    <div><button type="button" onclick="openMaintenanceModal()" class="btn btn-sm btn-primary">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Maintenance Request</button></div>
                 </div>
                 <div class="space-y-3 table-responsive">
                     <table class="table-striped table">
@@ -144,7 +143,7 @@
         <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100">
             <div class="flex items-center space-x-6">
                 <h3 class="text-lg font-semibold text-neutral-900">Maintenance Requests</h3>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#maintenanceRequestModal">
+                <button type="button" onclick="openMaintenanceModal()" class="btn btn-primary">
                     New Maintenance Request
                 </button>
             </div>
@@ -179,40 +178,52 @@
                 </table>
         </div>
 
-        <!--Maintenance Request Modal -->
-        <div class="modal fade" id="maintenanceRequestModal" tabindex="-1"
-            aria-labelledby="maintenanceRequestModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="maintenanceRequestModalLabel">New Maintenance Request</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ route('maintenance.new') }}" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                            <input type="hidden" name="facility_id" value="{{ $facility->id }}">
-                            <div class="mb-3">
-                                <label for="issue_description" class="form-label">Issue Description</label>
-                                <textarea class="form-control" id="issue_description" name="description" rows="3" required></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="priority_level" class="form-label>">Priority Level</label>
-                                <select class="form-select" id="priority_level" name="priority" required>
-                                    <option value="">Select priority</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit Request</button>
-                        </div>
-                    </form>
+<!-- Maintenance Request Modal -->
+<div id="maintenanceRequestModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full">
+        <div class="flex items-center justify-between p-6 border-b border-zinc-100">
+            <h3 class="text-lg font-semibold text-zinc-900">New Maintenance Request</h3>
+            <button onclick="closeMaintenanceModal()" class="text-zinc-400 hover:text-zinc-600 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <form action="{{ route('maintenance.new') }}" method="POST">
+            @csrf
+            <input type="hidden" name="facility_id" value="{{ $facility->id }}">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="issue_description" class="form-label">Issue Description</label>
+                    <textarea id="issue_description" name="description" rows="3" required class="form-input"></textarea>
+                </div>
+                <div>
+                    <label for="priority_level" class="form-label">Priority Level</label>
+                    <select id="priority_level" name="priority" required class="form-input">
+                        <option value="">Select priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
                 </div>
             </div>
-        </div>
+            <div class="flex justify-end gap-3 p-6 border-t border-zinc-100">
+                <button type="button" onclick="closeMaintenanceModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openMaintenanceModal() {
+    document.getElementById('maintenanceRequestModal').classList.remove('hidden');
+}
+function closeMaintenanceModal() {
+    document.getElementById('maintenanceRequestModal').classList.add('hidden');
+}
+document.getElementById('maintenanceRequestModal').addEventListener('click', function(e) {
+    if (e.target === this) closeMaintenanceModal();
+});
+</script>
         
 </x-layouts.app>

@@ -1,204 +1,261 @@
-@php
-    $cwd = getcwd();
-    $cssName = basename(glob($cwd . '/build/assets/*.css')[0], '.css');
-    $jsName = basename(glob($cwd . '/build/assets/*.js')[0], '.js');
-    $css = asset('build/assets/' . $cssName . '.css');
-    $js = asset('build/assets/' . $jsName . '.js');
-@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-<style>
-    .sidebar-text a {
-        color: #DA9100;
-        /* Tailwind's text-neutral-300 */
-    }
-
-    .sidebar-text:hover {
-        color: black;
-        /* White on hover */
-    }
-
-    .daralamah-green {
-        background-color: #324b45;
-        /* Dark green color */
-    }
-
-    .btn-primary {
-        background-color: #324b45 !important;
-        /* Dark green color */
-        border-color: #324b45 !important;
-        /* Match the background color */
-    }
-
-    .btn-primary:hover {
-        background-color: #2a3d39 !important;
-        /* Slightly darker on hover */
-        border-color: #2a3d39 !important;
-        /* Match the hover background color */
-    }
-
-    .badge-success {
-        background-color: #14923c !important;
-        /* Slightly darker on hover */
-        border-color: #14923c !important;
-        /* Match the hover background color */
-    }
-
-        .badge-warning {
-        background-color: #f59e0b !important;
-        /* Slightly darker on hover */
-        border-color: #f59e0b !important;
-        /* Match the hover background color */
-    }
-</style>
-
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    @include('partials.head')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    </link>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ $title ?? config('app.name') }}</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- App is light-mode only — do NOT use @fluxAppearance --}}
+    <style>:root { color-scheme: light; }</style>
+    <script>document.documentElement.classList.remove('dark')</script>
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800">
-    <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-green-950 sidebar-text">
-        <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
-        <a href="{{ route('dashboardoms') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse"
-            wire:navigate>
-            <x-app-logo />
+<body class="min-h-screen bg-[#f4f6f5] text-zinc-900 antialiased">
+
+<div x-data="{ sidebarOpen: false }" class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <div
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-[#324b45] transform transition-transform duration-300 ease-in-out
+               lg:translate-x-0 lg:static lg:inset-0 flex flex-col">
+
+        <flux:sidebar sticky stashable class="border-e-0 !bg-[#324b45] !w-64 flex flex-col">
+               {{-- Mobile close --}}
+    <flux:sidebar.toggle class="lg:hidden self-end m-3 text-white/60 hover:text-white" icon="x-mark" />
+
+    {{-- Logo --}}
+    <div class="px-5 pt-6 pb-5 border-b border-white/10">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3" wire:navigate>
+            <div class="w-9 h-9 rounded-xl bg-[#DA9100] flex items-center justify-center shadow-sm shrink-0">
+                <x-app-logo-icon class="w-5 h-5 fill-white" />
+            </div>
+            <div class="min-w-0">
+                <p class="text-white font-bold text-sm leading-tight truncate">{{ config('app.name', 'Orphanage') }}</p>
+                <p class="text-white/40 text-[11px] leading-tight">Management System</p>
+            </div>
         </a>
+    </div>
 
-        <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('Platform')" class="grid">
-                <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
-                    wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                <flux:navlist.item icon="users" :href="route('children.index')"
-                    :current="request()->routeIs('children.*')" wire:navigate>{{ __('Children') }}</flux:navlist.item>
-                @if (auth()->user()->isAdmin() || auth()->user()->isCaregiver())
-                    <flux:navlist.item icon="building-library" :href="route('facilities.index')"
-                        :current="request()->routeIs('facilities.*')" wire:navigate> {{ __('Facilities') }}
-                    </flux:navlist.item>
-                    <flux:navlist.item icon="building-library" :href="route('volunteers.index')"
-                        :current="request()->routeIs('volunteers.*')" wire:navigate> {{ __('Volunteers') }}
-                    </flux:navlist.item>
-                @endif
-                @if (auth()->user()->isAdmin() || auth()->user()->isCaregiver())
-                    <flux:navlist.item icon="building-library" :href="route('donors.index')"
-                        :current="request()->routeIs('donors.*')" wire:navigate> {{ __('Donors') }}
-                    </flux:navlist.item>
-                @endif
-                @if (auth()->user()->isAdmin())
-                    <flux:navlist.item icon="user-group" :href="route('staff.index')"
-                        :current="request()->routeIs('staff.*')" wire:navigate> {{ __('Staff') }}</flux:navlist.item>
-                @endif
-                <flux:navlist.item icon="building-library" :href="route('maintenance.index')"
-                    :current="request()->routeIs('maintenance.*')" wire:navigate> {{ __('Maintenance') }}
-                </flux:navlist.item>
-                <flux:navlist.item icon="building-library" :href="route('documents.index')"
-                    :current="request()->routeIs('documents.*')" wire:navigate> {{ __('Documents') }}
+    {{-- Navigation --}}
+    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+
+        {{-- Main section --}}
+        <div>
+            <p class="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/35 select-none">Main</p>
+            <flux:navlist variant="outline">
+                <flux:navlist.item
+                    icon="squares-2x2"
+                    :href="route('dashboard')"
+                    :current="request()->routeIs('dashboard')"
+                    wire:navigate>
+                    Dashboard
                 </flux:navlist.item>
 
-            </flux:navlist.group>
-        </flux:navlist>
+                <flux:navlist.item
+                    icon="face-smile"
+                    :href="route('children.index')"
+                    :current="request()->routeIs('children.*')"
+                    wire:navigate>
+                    Children
+                </flux:navlist.item>
 
-        <flux:spacer />
+                @if(auth()->user()->isAdmin() || auth()->user()->isCaregiver())
+                <flux:navlist.item
+                    icon="building-office-2"
+                    :href="route('facilities.index')"
+                    :current="request()->routeIs('facilities.*')"
+                    wire:navigate>
+                    Facilities
+                </flux:navlist.item>
 
+                <flux:navlist.item
+                    icon="hand-raised"
+                    :href="route('volunteers.index')"
+                    :current="request()->routeIs('volunteers.*')"
+                    wire:navigate>
+                    Volunteers
+                </flux:navlist.item>
 
-        <!-- Desktop User Menu -->
-        <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-            <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
-                icon:trailing="chevrons-up-down" data-test="sidebar-menu-button" />
+                <flux:navlist.item
+                    icon="heart"
+                    :href="route('donors.index')"
+                    :current="request()->routeIs('donors.*')"
+                    wire:navigate>
+                    Donors
+                </flux:navlist.item>
+                @endif
+            </flux:navlist>
+        </div>
 
-            <flux:menu class="w-[220px]">
+        {{-- Management section --}}
+        <div>
+            <p class="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/35 select-none">Management</p>
+            <flux:navlist variant="outline">
+                @if(auth()->user()->isAdmin())
+                <flux:navlist.item
+                    icon="user-group"
+                    :href="route('staff.index')"
+                    :current="request()->routeIs('staff.*')"
+                    wire:navigate>
+                    Staff
+                </flux:navlist.item>
+                @endif
+
+                <flux:navlist.item
+                    icon="wrench-screwdriver"
+                    :href="route('maintenance.index')"
+                    :current="request()->routeIs('maintenance.*')"
+                    wire:navigate>
+                    Maintenance
+                    @php $pending = \App\Models\MaintenanceRequest::pending()->count(); @endphp
+                    @if($pending > 0)
+                        <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-[#DA9100] text-white text-[10px] font-bold flex items-center justify-center">
+                            {{ $pending > 99 ? '99+' : $pending }}
+                        </span>
+                    @endif
+                </flux:navlist.item>
+
+                <flux:navlist.item
+                    icon="folder-open"
+                    :href="route('documents.index')"
+                    :current="request()->routeIs('documents.*')"
+                    wire:navigate>
+                    Documents
+                </flux:navlist.item>
+
+                @if(auth()->user()->isAdmin())
+                <flux:navlist.item
+                    icon="chart-bar"
+                    :href="route('reports.index')"
+                    :current="request()->routeIs('reports.*')"
+                    wire:navigate>
+                    Reports
+                </flux:navlist.item>
+                @endif
+            </flux:navlist>
+        </div>
+    </div>
+
+    {{-- User profile --}}
+    <div class="border-t border-white/10 px-3 py-3">
+        <flux:dropdown position="top" align="start" class="w-full">
+            <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-[#DA9100]/30 flex items-center justify-center text-[#DA9100] font-bold text-sm shrink-0">
+                    {{ auth()->user()->initials() }}
+                </div>
+                <div class="flex-1 min-w-0 text-left">
+                    <p class="text-white text-sm font-medium leading-tight truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-white/40 text-xs leading-tight truncate">{{ auth()->user()->email }}</p>
+                </div>
+                <svg class="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                </svg>
+            </button>
+
+            <flux:menu class="w-56">
                 <flux:menu.radio.group>
-                    <div class="p-0 text-sm font-normal">
-                        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                            <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                    {{ auth()->user()->initials() }}
-                                </span>
-                            </span>
-
-                            <div class="grid flex-1 text-start text-sm leading-tight">
-                                <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                            </div>
+                    <div class="flex items-center gap-2.5 px-3 py-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-[#324b45] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                            {{ auth()->user()->initials() }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-zinc-900 truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-zinc-500 truncate">{{ auth()->user()->email }}</p>
                         </div>
                     </div>
                 </flux:menu.radio.group>
 
                 <flux:menu.separator />
 
-                <flux:menu.radio.group>
-                    <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}
-                    </flux:menu.item>
-                </flux:menu.radio.group>
+                <flux:menu.item :href="route('profile.edit')" icon="cog-6-tooth" wire:navigate>
+                    Account Settings
+                </flux:menu.item>
+                <flux:menu.item :href="route('appearance.edit')" icon="swatch" wire:navigate>
+                    Appearance
+                </flux:menu.item>
 
                 <flux:menu.separator />
 
                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full"
-                        data-test="logout-button">
-                        {{ __('Log Out') }}
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full text-red-600 hover:bg-red-50">
+                        Sign Out
                     </flux:menu.item>
                 </form>
             </flux:menu>
         </flux:dropdown>
-    </flux:sidebar>
+    </div>
+        </flux:sidebar>
+    </div>
 
-    <!-- Mobile User Menu -->
-    <flux:header class="lg:hidden">
-        <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+    <!-- Overlay (mobile only) -->
+    <div
+        x-show="sidebarOpen"
+        @click="sidebarOpen = false"
+        class="fixed inset-0 bg-black/40 z-40 lg:hidden"
+        x-transition.opacity>
+    </div>
 
-        <flux:spacer />
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
 
-        <flux:dropdown position="top" align="end">
-            <flux:profile :initials="auth()->user()->initials()" icon-trailing="chevron-down" />
+        <!-- Header -->
+        <div class="lg:hidden">
+            <flux:header class="bg-[#324b45] shadow-sm">
 
-            <flux:menu>
-                <flux:menu.radio.group>
-                    <div class="p-0 text-sm font-normal">
-                        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                            <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                    {{ auth()->user()->initials() }}
-                                </span>
-                            </span>
+                <!-- Toggle button -->
+                <button
+                    @click="sidebarOpen = true"
+                    class="text-white/70 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
 
-                            <div class="grid flex-1 text-start text-sm leading-tight">
-                                <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                            </div>
-                        </div>
+                <flux:spacer />
+
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-white font-semibold text-sm">
+                    <div class="w-6 h-6 rounded-md bg-[#DA9100] flex items-center justify-center">
+                        <x-app-logo-icon class="w-3.5 h-3.5 fill-white" />
                     </div>
-                </flux:menu.radio.group>
+                    {{ config('app.name', 'Orphanage') }}
+                </a>
 
-                <flux:menu.separator />
+                <flux:spacer />
 
-                <flux:menu.radio.group>
-                    <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}
-                    </flux:menu.item>
-                </flux:menu.radio.group>
+                <div class="w-8 h-8 rounded-lg bg-[#DA9100]/20 flex items-center justify-center text-[#DA9100] font-bold text-sm">
+                    {{ auth()->user()->initials() }}
+                </div>
 
-                <flux:menu.separator />
+            </flux:header>
+        </div>
 
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                    @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full"
-                        data-test="logout-button">
-                        {{ __('Log Out') }}
-                    </flux:menu.item>
-                </form>
-            </flux:menu>
-        </flux:dropdown>
-    </flux:header>
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto p-6 lg:p-8">
+            {{ $slot }}
+        </main>
 
-    {{ $slot }}
+    </div>
 
-    @fluxScripts
+</div>
+
+<!-- AlpineJS (required for toggle) -->
+<script src="//unpkg.com/alpinejs" defer></script>
+
+<!-- Lucide -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    document.addEventListener('livewire:navigated', () => lucide.createIcons());
+</script>
+
+@fluxScripts
 </body>
-
 </html>

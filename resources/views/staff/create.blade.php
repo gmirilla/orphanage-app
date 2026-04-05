@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Add New Staff Member')
-
-@section('content')
+<x-layouts.app>
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
@@ -234,7 +230,7 @@
                     <label for="salary" class="form-label">Salary</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="text-gray-500 sm:text-sm">$</span>
+                            <span class="text-gray-500 sm:text-sm">&#8358;</span>
                         </div>
                         <input type="number" 
                                id="salary" 
@@ -334,4 +330,4 @@
         </div>
     </form>
 </div>
-@endsection
+</x-layouts.app>

@@ -53,13 +53,23 @@ class DashboardController extends Controller
         // Charts data
         $chartData = $this->getChartData();
 
+        // Additional quick stats
+        $thisMonthDonations = \App\Models\Donation::received()
+            ->whereYear('donation_date', now()->year)
+            ->whereMonth('donation_date', now()->month)
+            ->sum('amount');
+
+        $pendingMaintenance = MaintenanceRequest::pending()->get();
+
         return view('dashboard', compact(
             'metrics',
             'recentChildren',
             'recentDonations',
             'unreadNotifications',
             'chartData',
-            'user'
+            'user',
+            'thisMonthDonations',
+            'pendingMaintenance'
         ));
     }
 

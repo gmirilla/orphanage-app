@@ -21,7 +21,7 @@
                 <!-- REQUEST TITLE -->
                 <div class="mb-3">
                     <label for="title" class="form-label" required><b>Title</b></label>
-                    <input type="text" name="title" id="title" class="form-control"
+                    <input type="text" name="title" id="title" class="form-input"
                         value="{{ old('title', $maintenanceRequest->title) }}" disabled>
                     @error('title')
                         <div class="text-danger">{{ $message }}</div>
@@ -31,7 +31,7 @@
                 <div class="mb-3 flex justify-between">
                     <div>
                         <label for="requested_by" class="form-label" required>Requested By:</label>
-                        <input type="text" name="requested_by" id="requested_by" class="form-control"
+                        <input type="text" name="requested_by" id="requested_by" class="form-input"
                             value="{{ old('requested_by', $maintenanceRequest->requestedBy->name) }}" disabled>
                         @error('requested_by')
                             <div class="text-danger">{{ $message }}</div>
@@ -40,7 +40,7 @@
                     </div>
                     <div>
                         <label for="priority" class="form-label" required>Priority</label>
-                        <input type="text" name="priority" id="priority" class="form-control"
+                        <input type="text" name="priority" id="priority" class="form-input"
                             value="{{ old('priority', ucfirst($maintenanceRequest->priority)) }}" disabled>
                         @error('priority')
                             <div class="text-danger">{{ $message }}</div>
@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <label for="status" class="form-label" required>Status</label>
-                        <input type="text" name="status" id="status" class="form-control"
+                        <input type="text" name="status" id="status" class="form-input"
                             value="{{ old('status', ucfirst($maintenanceRequest->status)) }}" disabled>
                         @error('status')
                             <div class="text-danger">{{ $message }}</div>
@@ -58,7 +58,7 @@
                     </div>
                     <div>
                         <label for="requested_date" class="form-label" required>Requested Date</label>
-                        <input type="text" name="requested_date" id="requested_date" class="form-control"
+                        <input type="text" name="requested_date" id="requested_date" class="form-input"
                             value="{{ old('requested_date', $maintenanceRequest->requested_date) }}" disabled>
                         @error('requested_date')
                             <div class="text-danger">{{ $message }}</div>
@@ -71,7 +71,7 @@
                 <!-- REQUEST description -->
                 <div class="mb-3">
                     <label for="description" class="form-label" required>Description</label>
-                    <textarea class="form-control" name="description" id="description" cols="30" rows="5" disabled>{{ old('description', $maintenanceRequest->description) }}</textarea>
+                    <textarea class="form-input" name="description" id="description" cols="30" rows="5" disabled>{{ old('description', $maintenanceRequest->description) }}</textarea>
                     @error('description')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -80,7 +80,7 @@
                 <!-- REQUEST reolution/note -->
                 <div class="mb-3">
                     <label for="resolution" class="form-label" required>Resolution</label>
-                    <textarea class="form-control" name="resolution" id="resolution" cols="30" rows="5" disabled>{{ old('resolution', $maintenanceRequest->resolution) }}</textarea>
+                    <textarea class="form-input" name="resolution" id="resolution" cols="30" rows="5" disabled>{{ old('resolution', $maintenanceRequest->resolution) }}</textarea>
                     @error('resolution')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -89,7 +89,7 @@
                 <div class="mb-3 flex justify-between">
                     <div>
                         <label for="assigned_to" class="form-label" required>Assigned To</label>
-                        <input type="text" name="assigned_to" id="assigned_to" class="form-control"
+                        <input type="text" name="assigned_to" id="assigned_to" class="form-input"
                             value="{{ old('assigned_to', $maintenanceRequest->assignedTo->name ?? 'Unassigned') }}"
                             disabled>
                         @error('assigned_to')
@@ -99,7 +99,7 @@
                     </div>
                     <div>
                         <label for="due_date" class="form-label" required>Due Date</label>
-                        <input type="text" name="due_date" id="due_date" class="form-control"
+                        <input type="text" name="due_date" id="due_date" class="form-input"
                             value="{{ old('due_date', ucfirst($maintenanceRequest->due_date)) }}" disabled>
                         @error('due_date')
                             <div class="text-danger">{{ $message }}</div>
@@ -108,7 +108,7 @@
                     </div>
                     <div>
                         <label for="estimated_cost" class="form-label" required>Estimated Cost</label>
-                        <input type="text" name="estimated_cost" id="estimated_cost" class="form-control"
+                        <input type="text" name="estimated_cost" id="estimated_cost" class="form-input"
                             value="{{ old('estimated_cost', $maintenanceRequest->estimated_cost) }}" disabled>
                         @error('estimated_cost')
                             <div class="text-danger">{{ $message }}</div>
@@ -117,7 +117,7 @@
                     </div>
                     <div>
                         <label for="actual_cost" class="form-label" required>Actual Cost</label>
-                        <input type="text" name="actual_cost" id="actual_cost" class="form-control"
+                        <input type="text" name="actual_cost" id="actual_cost" class="form-input"
                             value="{{ old('actual_cost', $maintenanceRequest->actual_cost) }}" disabled>
                         @error('actual_cost')
                             <div class="text-danger">{{ $message }}</div>
@@ -126,7 +126,7 @@
                     </div>
                     <div>
                         <label for="completed_date" class="form-label" required>Completed Date</label>
-                        <input type="text" name="completed_date" id="completed_date" class="form-control"
+                        <input type="text" name="completed_date" id="completed_date" class="form-input"
                             value="{{ old('completed_date', $maintenanceRequest->completed_date) }}" disabled>
                         @error('completed_date')
                             <div class="text-danger">{{ $message }}</div>

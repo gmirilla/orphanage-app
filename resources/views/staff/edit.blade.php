@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Edit Staff Member - ' . $staff->name)
-
-@section('content')
+<x-layouts.app>
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
@@ -347,4 +343,4 @@
         </div>
     </form>
 </div>
-@endsection
+</x-layouts.app>

@@ -21,7 +21,7 @@
         <!-- Room Details -->
         <div class="mb-3">
             <label for="name" class="form-label" required>Facility Name</label>
-            <input type="text" name="description" id="facilityname" class="form-control" value="{{ old('description', $facility->description ?? '') }}" disabled >
+            <input type="text" name="description" id="facilityname" class="form-input" value="{{ old('description', $facility->description ?? '') }}" disabled >
             @error('description')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
@@ -30,7 +30,7 @@
         <!-- Facility Type -->
         <div class="mb-3">
             <label for="type" class="form-label">Facility Type</label>
-            <input type="text" name="type" id ="type" class="form-control" value="{{$facility->type}}" disabled>
+            <input type="text" name="type" id ="type" class="form-input" value="{{$facility->type}}" disabled>
 
             @error('type')
                 <div class="text-danger">{{ $message }}</div>
@@ -43,17 +43,17 @@
 
         <div class="mb-3">
             <label for="room_number" class="form-label">Room Number</label>
-            <input type="text" name="room_number" id="room_number" class="form-control" value="{{ old('room_number') }}" placeholder="Enter Room Number or Description">
+            <input type="text" name="room_number" id="room_number" class="form-input" value="{{ old('room_number') }}" placeholder="Enter Room Number or Description">
         </div>
                 <!-- Bed Count-->
         <div class="mb-3">
             <label for="bed_count" class="form-label">Bed Count</label>
-            <input type="number" name="bed_count" id="bed_count" class="form-control" value="{{ old('bed_count') }}" placeholder="How many Beds available in Room">
+            <input type="number" name="bed_count" id="bed_count" class="form-input" value="{{ old('bed_count') }}" placeholder="How many Beds available in Room">
         </div>
                         <!-- Is Room Active-->
         <div class="mb-3">
             <label for="is_active" class="form-label">Is Active</label>
-            <select name="is_active" id="is_active" class="form-control form-select">
+            <select name="is_active" id="is_active" class="form-input">
                 <option value="1" {{ old('is_active') == 1 ? 'selected' : '' }}>Yes</option>
                 <option value="0" {{ old('is_active') == 0 ? 'selected' : '' }}>No</option>
             </select>

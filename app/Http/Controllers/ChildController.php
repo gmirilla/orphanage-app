@@ -86,9 +86,9 @@ class ChildController extends Controller
         // Handle profile photo upload
         if ($request->hasFile('profile_photo')) {
             $photo = $request->file('profile_photo');
-            $filename = 'child_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
-            $path = $photo->storeAs('public/profile-photos', $filename);
-            $data['profile_photo'] = str_replace('public/', '', $path);
+            $filename = 'child_' . time() . '_' . uniqid() . '.' . $photo->extension();
+            $path = $photo->storeAs('profile-photos', $filename, 'public');
+            $data['profile_photo'] = $path;
         }
 
         $child = Child::create($data);
@@ -151,9 +151,9 @@ class ChildController extends Controller
             }
 
             $photo = $request->file('profile_photo');
-            $filename = 'child_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
-            $path = $photo->storeAs('public/profile-photos', $filename);
-            $data['profile_photo'] = str_replace('public/', '', $path);
+            $filename = 'child_' . time() . '_' . uniqid() . '.' . $photo->extension();
+            $path = $photo->storeAs('profile-photos', $filename, 'public');
+            $data['profile_photo'] = $path;
         }
 
         $child->update($data);
@@ -314,8 +314,7 @@ class ChildController extends Controller
             EducationHistory::create($validated);
             return back()->with('sucess', 'Education record added successfully');
         } catch (\Throwable $th) {
-            //throw $th;
-            dd($th->getMessage());
+            \Illuminate\Support\Facades\Log::error('Failed to add education record: ' . $th->getMessage());
             return back()->with('error', 'Failed to add education record. Please try again.');
         }
 

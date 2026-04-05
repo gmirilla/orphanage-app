@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Staff Profile - ' . $staff->name)
-
-@section('content')
+<x-layouts.app>
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -377,4 +373,4 @@
         </div>
     </div>
 </div>
-@endsection
+</x-layouts.app>

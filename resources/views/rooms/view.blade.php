@@ -18,7 +18,7 @@
             <!-- Room Details -->
             <div class="mb-3">
                 <label for="name" class="form-label" required>Facility Name</label>
-                <input type="text" name="description" id="facilityname" class="form-control"
+                <input type="text" name="description" id="facilityname" class="form-input"
                     value="{{ old('description', $facility->description ?? '') }}" disabled>
                 @error('description')
                     <div class="text-danger">{{ $message }}</div>
@@ -28,7 +28,7 @@
             <!-- Facility Type -->
             <div class="mb-3">
                 <label for="type" class="form-label">Facility Type</label>
-                <input type="text" name="type" id ="type" class="form-control" value="{{ $facility->type }}"
+                <input type="text" name="type" id ="type" class="form-input" value="{{ $facility->type }}"
                     disabled>
 
                 @error('type')
@@ -42,30 +42,30 @@
 
             <div class="mb-3">
                 <label for="room_number" class="form-label">Room Number</label>
-                <input type="text" name="room_number" id="room_number" class="form-control"
+                <input type="text" name="room_number" id="room_number" class="form-input"
                     value="{{ $roomAllocation->room_number }}" placeholder="Enter Room Number or Description" disabled>
             </div>
             <!-- Bed Count-->
             <div class="mb-3">
                 <label for="bed_count" class="form-label">Bed Count</label>
-                <input type="number" name="bed_count" id="bed_count" class="form-control"
+                <input type="number" name="bed_count" id="bed_count" class="form-input"
                     value="{{ $roomAllocation->bed_count }}" placeholder="How many Beds available in Room" disabled>
             </div>
             <!-- Occupants Count-->
             <div class="mb-3">
                 <label for="occupied_beds" class="form-label">Occupied Beds</label>
-                <input type="number" name="occupied_beds" id="occupied_beds" class="form-control"
+                <input type="number" name="occupied_beds" id="occupied_beds" class="form-input"
                     value="{{ $roomAllocation->occupied_beds ?? 0 }}" disabled>
             </div>
             <!-- Is Room Active-->
             <div class="mb-3">
                 <label for="is_active" class="form-label">Is Active</label>
                 @if ($roomAllocation->is_active == 1)
-                    <div class="form-control" disabled>Yes</div> <button type="button"
+                    <div class="form-input" disabled>Yes</div> <button type="button"
                         onclick="updateRoom({{ $roomAllocation->id }})" class="btn btn-sm btn-danger">Make
                         Inactive</button>
                 @else
-                    <div class="form-control" disabled>No</div> <button type="button"
+                    <div class="form-input" disabled>No</div> <button type="button"
                         onclick="updateRoom({{ $roomAllocation->id }})" class="btn btn-sm btn-success">Make
                         Active</button>
                 @endif
@@ -128,51 +128,55 @@
                         </ul>
                     @endif
                 </div>
-                <button type="button" class="btn btn-success py-2" data-bs-toggle="modal"
-                    data-bs-target="#roomAssignModal" data-bs-whatever=""><i class="fa fa-bed"></i>Assign Child</button>
+                <button type="button" onclick="openAssignModal()" class="btn btn-primary">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Assign Child
+                </button>
             </div>
 
             <!-- Modal for Assigning Child to Room -->
-            <div class="modal fade" id="roomAssignModal" tabindex="-1" aria-labelledby="roomAssignModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Child Room Assignment</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form method="POST" action="{{ route('rooms.assignChild', $roomAllocation->id) }}">
-                                @csrf
-                                <div class="mb-3">
-                                    <div class="col-auto">
-                                        <label class='form-label' for="childid">Child Name</label>
-<select name="childid" required class="form-select form-control-lg" id="childid">
-    <option value="">Select Child</option>
-
-    @foreach ($children as $child)
-        @if (empty($child->currentRoomAssignment)) 
-            <option value="{{ $child->id }}">
-                {{ $child->name }} |
-                <b>{{ $child->currentRoomAssignment->room_number ?? 'Unassigned' }}</b>
-            </option>
-        @endif
-    @endforeach
-</select>
-
-                                        <input type="number" id="room_allocation_id" name="room_allocation_id"
-                                            value="{{ $roomAllocation->id }}" hidden>
-                                        <button type="submit" class="btn btn-primary mt-3">Assign Child to
-                                            Room</button>
-                                    </div>
-                            </form>
-
-                        </div>
-
+            <div id="roomAssignModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+                    <div class="flex items-center justify-between p-6 border-b border-zinc-100">
+                        <h3 class="text-lg font-semibold text-zinc-900">Assign Child to Room</h3>
+                        <button onclick="closeAssignModal()" class="text-zinc-400 hover:text-zinc-600 transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
                     </div>
+                    <form method="POST" action="{{ route('rooms.assignChild', $roomAllocation->id) }}">
+                        @csrf
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <label class="form-label" for="childid">Select Child</label>
+                                <select name="childid" required class="form-input" id="childid">
+                                    <option value="">— Choose a child —</option>
+                                    @foreach ($children as $child)
+                                        @if (empty($child->currentRoomAssignment))
+                                            <option value="{{ $child->id }}">{{ $child->name }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+                            <input type="hidden" name="room_allocation_id" value="{{ $roomAllocation->id }}">
+                        </div>
+                        <div class="flex justify-end gap-3 p-6 border-t border-zinc-100">
+                            <button type="button" onclick="closeAssignModal()" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Assign to Room</button>
+                        </div>
+                    </form>
                 </div>
             </div>
+
+            <script>
+            function openAssignModal() {
+                document.getElementById('roomAssignModal').classList.remove('hidden');
+            }
+            function closeAssignModal() {
+                document.getElementById('roomAssignModal').classList.add('hidden');
+            }
+            document.getElementById('roomAssignModal').addEventListener('click', function(e) {
+                if (e.target === this) closeAssignModal();
+            });
+            </script>
 
 
 

@@ -186,7 +186,7 @@
             <div id="content-education" class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold text-neutral-900">Education History</h3>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#educationModal">
+                    <button class="btn btn-primary btn-sm" onclick="openModal('educationModal')">
                         <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                         Add Education
                     </button>
@@ -225,8 +225,7 @@
         <div id="content-talents" class="p-6 hidden">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-neutral-900">Talents & Interests</h3>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#talentsModal"
-                    onclick="openTalentModal()">
+                <button class="btn btn-primary btn-sm" onclick="openModal('talentsModal')">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                     Add Talent
                 </button>
@@ -258,7 +257,7 @@
         <div id="content-milestones" class="p-6 hidden">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-neutral-900">Development Milestones</h3>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#milestoneModal">
+                <button class="btn btn-primary btn-sm" onclick="openModal('milestoneModal')">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                     Add Milestone
                 </button>
@@ -309,8 +308,7 @@
         <div id="content-documents" class="p-6 hidden">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-neutral-900">Documents</h3>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#documentModal"
-                    onclick="openDocumentModal()">
+                <button class="btn btn-primary btn-sm" onclick="openModal('documentModal')">
                     <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
                     Upload Document
                 </button>
@@ -345,92 +343,85 @@
         </div>
     </div>
 
-    <!-- Modals for Adding Records go Here (Education, Talent,Milestone, Document) -->
-    <div class="modal fade" id="educationModal" tabindex="-1"
-        aria-labelledby="educationModalLabel" aria-hidden="true" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <form id="educationForm" method="POST" action="{{ route('children.education-record', $child) }}">
-                    @csrf
-                    <div class="modal-header">Create New Education Record
+    </div>{{-- end tab contents --}}
+
+    {{-- ── Education Modal ── --}}
+    <div id="educationModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b border-zinc-100">
+                <h3 class="text-lg font-semibold text-zinc-900">Add Education Record</h3>
+                <button onclick="closeModal('educationModal')" class="text-zinc-400 hover:text-zinc-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form method="POST" action="{{ route('children.education-record', $child) }}">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="form-label">Name of School</label>
+                        <input type="text" name="school_name" class="form-input" required>
                     </div>
-                    <div class="modal-body">
-                        <!-- Form fields for education record -->
-                        <div class="mb-3">
-                            <label for="school_name" class="form-label">Name of School</label>
-                            <input type="text" name="school_name" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="education_level" class="form-label">Education Level</label>
-                            <select type="text" name="education_level" class="form-select" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Education Level</label>
+                            <select name="education_level" class="form-input" required>
                                 <option value="primary">Primary</option>
                                 <option value="secondary">Secondary</option>
                                 <option value="tertiary">Tertiary</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="grade" class="form-label">Grade/Class</label>
-                            <input type="text" name="grade" class="form-control"
-                                placeholder="Class or Grade of Child">
-                        </div>
-
-                            <div>
-                                <label for="academic_progress" class="form-label">Academic Progress/Note</label>
-                                <input type="text" name="academic_progress" class="form-control" required
-                                    placeholder="Brief note on academic progress">
-                            </div>
-                            <div class="mb-3 col-md-6 d-flex gap-3">
-                            <div>
-                                <label for="start_date"class="form-label">Start Date</label>
-                                <input type="date" name="start_date" id="start_date" class="form-control"
-                                    required>
-                            </div>
-
                         <div>
-                            <label for="end_date"class="form-label">End Date</label>
-                            <input type="date" name="end_date" id="end_date" class="form-control">
+                            <label class="form-label">Grade / Class</label>
+                            <input type="text" name="grade" class="form-input" placeholder="e.g. JSS 2">
                         </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="status"class="form-label">Status</label>
-                            <select type="text" name="status" class="form-select" required>
-                                <option value="enrolled">Enrolled</option>
-                                <option value="completed">Completed</option>
-                                <option value="dropped">Dropped</option>
-                            </select>
-                        </div>
-
-
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save</button>
+                    <div>
+                        <label class="form-label">Academic Progress Note</label>
+                        <input type="text" name="academic_progress" class="form-input" required placeholder="Brief note on progress">
                     </div>
-                </form>
-            </div>
-        </div>
-
-    </div>
-    <!--Modal for Talents-->
-    <div class="modal fade" id="talentsModal" tabindex="-1" aria-labelledby="talentsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">Create New Talent Record
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="start_date" class="form-input" required>
+                        </div>
+                        <div>
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="end_date" class="form-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-input" required>
+                            <option value="enrolled">Enrolled</option>
+                            <option value="completed">Completed</option>
+                            <option value="dropped">Dropped</option>
+                        </select>
+                    </div>
                 </div>
+                <div class="flex justify-end gap-3 p-6 border-t border-zinc-100">
+                    <button type="button" onclick="closeModal('educationModal')" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                    <form id="talentForm" method="POST" action="{{ route('children.assign-talent', $child) }}">
-                <div class="modal-body">
-
-                        @csrf
-                        <!-- Form fields for education record -->
-
-                        <div class="mb-3">
-                            <label for="talent_name" class="form-label" >Talent/Interest Name</label>
-                            <input type="text" name="talent_name" class="form-control" required placeholder="Enter name of Talent">
-                        </div>
-                        <div class="mb-3">
-                            <label for="category" class="form-label">Category</label>
-                            <select name="category" id="category" class="form-select">
+    {{-- ── Talents Modal ── --}}
+    <div id="talentsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div class="flex items-center justify-between p-6 border-b border-zinc-100">
+                <h3 class="text-lg font-semibold text-zinc-900">Add Talent / Interest</h3>
+                <button onclick="closeModal('talentsModal')" class="text-zinc-400 hover:text-zinc-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form method="POST" action="{{ route('children.assign-talent', $child) }}">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="form-label">Talent / Interest Name</label>
+                        <input type="text" name="talent_name" class="form-input" required placeholder="e.g. Football, Piano">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-input">
                                 <option value="art">Art</option>
                                 <option value="music">Music</option>
                                 <option value="sports">Sports</option>
@@ -439,138 +430,109 @@
                                 <option value="social">Social</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="level" class="form-label">Proficiency Level</label>
-                            <select name="level" id="level" class="form-select">
+                        <div>
+                            <label class="form-label">Proficiency Level</label>
+                            <select name="level" class="form-input">
                                 <option value="beginner">Beginner</option>
                                 <option value="intermediate">Intermediate</option>
                                 <option value="advanced">Advanced</option>
                                 <option value="expert">Expert</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <input type="text" name="description" class="form-control"
-                                placeholder="Short description or Remarks">
-                        </div>
-
-
-                    
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-                                        </form>
-
-            </div>
-        </div>
-    </div>
-    <!--modal for Milestone-->
-    <div class="modal fade" id="milestoneModal" tabindex="-1" aria-labelledby="milestoneModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                                    <form id="milestoneForm" method="POST"
-                        action="{{ route('children.addmilestone', $child) }}">
-                        @csrf
-                <div class="modal-header">Create New Milestone Record
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Title </label>
-                        <input type="text" name="title"  class="form-control" required>
                     </div>
                     <div>
-                        <label for="type" class="form-label">Type </label>
-                        <select name="type"  class="form-select" required>
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-input" placeholder="Short remarks">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 p-6 border-t border-zinc-100">
+                    <button type="button" onclick="closeModal('talentsModal')" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Talent</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ── Milestone Modal ── --}}
+    <div id="milestoneModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div class="flex items-center justify-between p-6 border-b border-zinc-100">
+                <h3 class="text-lg font-semibold text-zinc-900">Add Development Milestone</h3>
+                <button onclick="closeModal('milestoneModal')" class="text-zinc-400 hover:text-zinc-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form method="POST" action="{{ route('children.addmilestone', $child) }}">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Type</label>
+                        <select name="type" class="form-input" required>
                             <option value="growth">Growth</option>
                             <option value="developmental">Developmental</option>
                             <option value="medical">Medical</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <input type="text" name="description"  class="form-control" required>
+                    <div>
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-input" required>
                     </div>
-                    
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
+                <div class="flex justify-end gap-3 p-6 border-t border-zinc-100">
+                    <button type="button" onclick="closeModal('milestoneModal')" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Milestone</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ── Document Modal ── --}}
+    <div id="documentModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div class="flex items-center justify-between p-6 border-b border-zinc-100">
+                <h3 class="text-lg font-semibold text-zinc-900">Upload Document</h3>
+                <button onclick="closeModal('documentModal')" class="text-zinc-400 hover:text-zinc-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-zinc-500">To upload documents for this child, use the <a href="{{ route('documents.create') }}" class="text-[#324b45] underline">Documents section</a>.</p>
+            </div>
+            <div class="flex justify-end gap-3 p-6 border-t border-zinc-100">
+                <button type="button" onclick="closeModal('documentModal')" class="btn btn-secondary">Close</button>
+                <a href="{{ route('documents.create') }}" class="btn btn-primary">Go to Documents</a>
             </div>
         </div>
-
-    </div>
-    <!--modal for Document-->
-    <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">Create New Document Record
-                </div>
-                <div class="modal-body">
-                    <form id="documentForm" method="POST"
-                        action="{{ route('children.education-record', $child) }}">
-                        @csrf
-                        Documentucation Records
-                        <!-- Form fields for education record -->
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
     </div>
 
     <script>
-        function showTab(tabName) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('[id^="content-"]');
-            contents.forEach(content => content.classList.add('hidden'));
-
-            // Remove active state from all tabs
-            const tabs = document.querySelectorAll('[id^="tab-"]');
-            tabs.forEach(tab => {
-                tab.classList.remove('border-primary-500', 'text-primary-600');
-                tab.classList.add('border-transparent', 'text-neutral-600');
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+        // Close any modal by clicking backdrop
+        document.querySelectorAll('[id$="Modal"]').forEach(function(modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) closeModal(this.id);
             });
+        });
 
-            // Show selected tab content
-            document.getElementById(`content-${tabName}`).classList.remove('hidden');
-
-            // Add active state to selected tab
-            document.getElementById(`tab-${tabName}`).classList.add('border-primary-500', 'text-primary-600');
-            document.getElementById(`tab-${tabName}`).classList.remove('border-transparent', 'text-neutral-600');
+        function showTab(tabName) {
+            document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('border-[#324b45]', 'text-[#324b45]');
+                el.classList.add('border-transparent', 'text-neutral-600');
+            });
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).classList.add('border-[#324b45]', 'text-[#324b45]');
+            document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-neutral-600');
         }
 
-
-        function openTalentModal() {
-            // Implementation for talent modal
-            console.log('Open talent modal');
-        }
-
-        function openMilestoneModal() {
-            // Implementation for milestone modal
-            console.log('Open milestone modal');
-        }
-
-        function openDocumentModal() {
-            // Implementation for document modal
-            console.log('Open document modal');
-        }
-
-        function regclick() {
-            // Implementation for document modal
-            console.log('button Clicked');
-        }
-    </script>
-    <script>
-        const today = new Date().toISOString().split("T")[0];
-        document.getElementById("end_date").setAttribute("max", today);
+        const today = new Date().toISOString().split('T')[0];
+        const endDateEl = document.getElementById('end_date');
+        if (endDateEl) endDateEl.setAttribute('max', today);
     </script>
 
 </x-layouts.app>
