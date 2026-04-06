@@ -238,6 +238,33 @@
                 </div>
             </div>
 
+            <!-- Room Assignment -->
+            <div>
+                <h3 class="text-lg font-semibold text-neutral-900 mb-4">Room Assignment <span class="text-sm font-normal text-neutral-500">(Optional)</span></h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="facility_id" class="form-label">Dormitory Facility</label>
+                        <select id="facility_id" name="facility_id" class="form-input w-full" onchange="loadRooms(this.value)">
+                            <option value="">— Select a dormitory —</option>
+                            @foreach($dormitories as $dorm)
+                                <option value="{{ $dorm->id }}" {{ old('facility_id') == $dorm->id ? 'selected' : '' }}>
+                                    {{ $dorm->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="room_allocation_id" class="form-label">Room</label>
+                        <select id="room_allocation_id" name="room_allocation_id" class="form-input w-full" disabled>
+                            <option value="">— Select a facility first —</option>
+                        </select>
+                        @error('room_allocation_id')
+                            <p class="error-message">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
             <!-- Form Actions -->
             <div class="flex justify-end space-x-4 pt-6 border-t border-neutral-200">
                 <a href="{{ route('children.index') }}" class="btn btn-secondary">
@@ -252,6 +279,44 @@
         </form>
     </div>
 </div>
+
+<script>
+const roomsJsonUrl = (facilityId) => `/facilities/${facilityId}/rooms-json`;
+
+async function loadRooms(facilityId) {
+    const roomSelect = document.getElementById('room_allocation_id');
+    roomSelect.innerHTML = '<option value="">Loading...</option>';
+    roomSelect.disabled = true;
+
+    if (!facilityId) {
+        roomSelect.innerHTML = '<option value="">— Select a facility first —</option>';
+        return;
+    }
+
+    const res = await fetch(roomsJsonUrl(facilityId));
+    const rooms = await res.json();
+
+    if (rooms.length === 0) {
+        roomSelect.innerHTML = '<option value="">No available rooms</option>';
+        return;
+    }
+
+    roomSelect.innerHTML = '<option value="">— Select a room —</option>' +
+        rooms.map(r => `<option value="${r.id}">${r.room_number} (${r.available_beds} bed${r.available_beds !== 1 ? 's' : ''} free)</option>`).join('');
+    roomSelect.disabled = false;
+}
+
+// Re-populate on page load if old() values exist (after validation failure)
+document.addEventListener('DOMContentLoaded', function () {
+    const facilitySelect = document.getElementById('facility_id');
+    const oldRoom = '{{ old('room_allocation_id') }}';
+    if (facilitySelect.value) {
+        loadRooms(facilitySelect.value).then(() => {
+            if (oldRoom) document.getElementById('room_allocation_id').value = oldRoom;
+        });
+    }
+});
+</script>
 
 @push('scripts')
 <script>

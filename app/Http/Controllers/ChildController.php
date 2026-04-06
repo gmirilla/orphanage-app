@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\EducationHistory;
+use App\Models\Facility;
+use App\Models\ChildRoomAssignment;
+use App\Models\RoomAllocation;
 
 
 class ChildController extends Controller
@@ -58,7 +61,8 @@ class ChildController extends Controller
     public function create()
     {
         $staff = \App\Models\User::whereIn('role', ['admin', 'caregiver'])->get();
-        return view('children.create', compact('staff'));
+        $dormitories = Facility::where('type', 'dormitory')->where('is_active', true)->orderBy('name')->get();
+        return view('children.create', compact('staff', 'dormitories'));
     }
 
     public function store(Request $request)
@@ -78,7 +82,8 @@ class ChildController extends Controller
             'weight_kg' => 'nullable|numeric|min:0|max:200',
             'special_needs' => 'nullable|string',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'admitted_by' => 'required|exists:users,id'
+            'admitted_by' => 'required|exists:users,id',
+            'room_allocation_id' => 'nullable|exists:room_allocations,id',
         ]);
 
         $data = $request->all();
@@ -92,6 +97,20 @@ class ChildController extends Controller
         }
 
         $child = Child::create($data);
+
+        // Assign to room if provided
+        if ($request->filled('room_allocation_id')) {
+            $room = RoomAllocation::findOrFail($request->room_allocation_id);
+            if ($room->available_beds > 0) {
+                ChildRoomAssignment::create([
+                    'child_id'           => $child->id,
+                    'room_allocation_id' => $room->id,
+                    'assigned_date'      => now()->toDateString(),
+                    'assigned_by'        => $user->id,
+                ]);
+                $room->increment('occupied_beds');
+            }
+        }
 
         // Create admission log
         $child->admissionLog()->create([
@@ -116,9 +135,10 @@ class ChildController extends Controller
 
     public function edit(Child $child)
     {
-        $child->load('admissionLog');
+        $child->load(['admissionLog', 'currentRoomAssignment.roomAllocation.facility']);
         $staff = \App\Models\User::whereIn('role', ['admin', 'caregiver'])->get();
-        return view('children.edit', compact('child', 'staff'));
+        $dormitories = Facility::where('type', 'dormitory')->where('is_active', true)->orderBy('name')->get();
+        return view('children.edit', compact('child', 'staff', 'dormitories'));
     }
 
     public function update(Request $request, Child $child)
@@ -138,7 +158,8 @@ class ChildController extends Controller
             'special_needs' => 'nullable|string',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'admitted_by' => 'required|exists:users,id',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'room_allocation_id' => 'nullable|exists:room_allocations,id',
         ]);
 
         $data = $request->all();
@@ -157,6 +178,35 @@ class ChildController extends Controller
         }
 
         $child->update($data);
+
+        // Handle room assignment changes
+        $newRoomId = $request->input('room_allocation_id');
+        $currentAssignment = $child->currentRoomAssignment;
+        $currentRoomId = $currentAssignment?->room_allocation_id;
+
+        if ($newRoomId != $currentRoomId) {
+            // Unassign from current room
+            if ($currentAssignment) {
+                $currentAssignment->update(['unassigned_date' => now()->toDateString()]);
+                $currentRoom = RoomAllocation::find($currentRoomId);
+                if ($currentRoom && $currentRoom->occupied_beds > 0) {
+                    $currentRoom->decrement('occupied_beds');
+                }
+            }
+            // Assign to new room
+            if ($newRoomId) {
+                $newRoom = RoomAllocation::findOrFail($newRoomId);
+                if ($newRoom->available_beds > 0) {
+                    ChildRoomAssignment::create([
+                        'child_id'           => $child->id,
+                        'room_allocation_id' => $newRoom->id,
+                        'assigned_date'      => now()->toDateString(),
+                        'assigned_by'        => Auth::id(),
+                    ]);
+                    $newRoom->increment('occupied_beds');
+                }
+            }
+        }
 
         return redirect()->route('children.show', $child)
             ->with('success', 'Child profile updated successfully.');

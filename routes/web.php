@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
     // Facilities Management
     Route::resource('facilities', FacilityController::class);
     Route::get('facilities/{facility}/rooms', [FacilityController::class, 'rooms'])->name('facilities.rooms');
+    Route::get('facilities/{facility}/rooms-json', [FacilityController::class, 'roomsJson'])->name('facilities.rooms-json');
     Route::post('facilities/{facility}/assign-room', [FacilityController::class, 'assignRoom'])->name('facilities.assign-room');
 
     // Room Allocations Management

@@ -194,6 +194,23 @@ class FacilityController extends Controller
     }
 
     /**
+     * Return active rooms for a facility as JSON (for dynamic dropdowns).
+     */
+    public function roomsJson(Facility $facility)
+    {
+        $rooms = $facility->roomAllocations()
+            ->where('is_active', true)
+            ->orderBy('room_number')
+            ->get(['id', 'room_number', 'bed_count', 'occupied_beds']);
+
+        return response()->json($rooms->map(fn($r) => [
+            'id'             => $r->id,
+            'room_number'    => $r->room_number,
+            'available_beds' => $r->bed_count - $r->occupied_beds,
+        ]));
+    }
+
+    /**
      * Show rooms for a facility.
      */
     public function rooms(Facility $facility)

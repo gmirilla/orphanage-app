@@ -167,7 +167,7 @@
                                 <td>{{ ucfirst($request->priority) }}</td>
                                 <td>{{ ucfirst($request->status) }}</td>
                                 <td>{{ $request->requested_date->format('M d, Y') }}</td>
-                                <td><a href="{{ route('maintenance.show', $request) }}" class="btn btn-sm btn-secondary">View Details</a></td>
+                                <td><a href="{{ route('maintenance.view', $request) }}" class="btn btn-sm btn-secondary">View Details</a></td>
                             </tr>
                         @empty
                             <tr>
