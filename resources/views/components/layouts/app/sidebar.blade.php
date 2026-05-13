@@ -56,6 +56,7 @@
                     Dashboard
                 </flux:navlist.item>
 
+                @if(auth()->user()->canAccessChildren())
                 <flux:navlist.item
                     icon="face-smile"
                     :href="route('children.index')"
@@ -63,6 +64,7 @@
                     wire:navigate>
                     Children
                 </flux:navlist.item>
+                @endif
 
                 @if(auth()->user()->isAdmin() || auth()->user()->isCaregiver())
                 <flux:navlist.item
@@ -80,13 +82,15 @@
                     wire:navigate>
                     Volunteers
                 </flux:navlist.item>
+                @endif
 
+                @if(auth()->user()->isAdmin())
                 <flux:navlist.item
                     icon="heart"
                     :href="route('donors.index')"
                     :current="request()->routeIs('donors.*')"
                     wire:navigate>
-                    Donors
+                    Circle of Friends
                 </flux:navlist.item>
                 @endif
             </flux:navlist>
@@ -128,13 +132,51 @@
                     Documents
                 </flux:navlist.item>
 
+                {{-- Requisitions: visible to everyone --}}
+                <flux:navlist.item
+                    icon="clipboard-document-list"
+                    :href="route('requisitions.index')"
+                    :current="request()->routeIs('requisitions.*')"
+                    wire:navigate>
+                    Requisitions
+                    @php
+                        $pendingReqs = auth()->user()->isAdmin() || auth()->user()->isHeadOfOperations()
+                            ? \App\Models\Requisition::pendingReview()->count()
+                            : 0;
+                    @endphp
+                    @if($pendingReqs > 0)
+                        <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-[#DA9100] text-white text-[10px] font-bold flex items-center justify-center">
+                            {{ $pendingReqs > 99 ? '99+' : $pendingReqs }}
+                        </span>
+                    @endif
+                </flux:navlist.item>
+
+                {{-- Staff Reports: visible to everyone; label changes for reviewers --}}
+                <flux:navlist.item
+                    icon="document-text"
+                    :href="route('staff-reports.index')"
+                    :current="request()->routeIs('staff-reports.*')"
+                    wire:navigate>
+                    {{ auth()->user()->isAdmin() || auth()->user()->isHeadOfOperations() ? 'All Reports' : 'My Reports' }}
+                    @php
+                        $pendingReports = auth()->user()->isAdmin() || auth()->user()->isHeadOfOperations()
+                            ? \App\Models\Report::pendingReview()->count()
+                            : 0;
+                    @endphp
+                    @if($pendingReports > 0)
+                        <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-[#DA9100] text-white text-[10px] font-bold flex items-center justify-center">
+                            {{ $pendingReports > 99 ? '99+' : $pendingReports }}
+                        </span>
+                    @endif
+                </flux:navlist.item>
+
                 @if(auth()->user()->isAdmin())
                 <flux:navlist.item
                     icon="chart-bar"
                     :href="route('reports.index')"
                     :current="request()->routeIs('reports.*')"
                     wire:navigate>
-                    Reports
+                    Analytics Reports
                 </flux:navlist.item>
                 @endif
             </flux:navlist>

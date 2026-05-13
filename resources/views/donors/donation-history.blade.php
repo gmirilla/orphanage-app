@@ -5,7 +5,7 @@
             <h2 class="text-2xl font-bold text-neutral-900">Donation History</h2>
             <p class="text-sm text-neutral-600">{{ $donor->name }}</p>
         </div>
-        <a href="{{ route('donors.show', $donor) }}" class="btn btn-secondary">Back to Donor</a>
+        <a href="{{ route('donors.show', $donor) }}" class="btn btn-secondary">Back to Member</a>
     </div>
 
     <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100">

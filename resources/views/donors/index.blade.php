@@ -2,11 +2,11 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-neutral-900">Donors</h2>
-            <p class="text-sm text-neutral-600">Manage donor records and donations</p>
+            <h2 class="text-2xl font-bold text-neutral-900">Circle of Friends</h2>
+            <p class="text-sm text-neutral-600">Manage Circle of Friends records and contributions</p>
         </div>
         <a href="{{ route('donors.create') }}" class="btn btn-primary mt-4 sm:mt-0">
-            <i class="fa fa-plus mr-2"></i> Add Donor
+            <i class="fa fa-plus mr-2"></i> Add Friend
         </a>
     </div>
 

@@ -19,7 +19,7 @@ class StaffController extends Controller
     public function index(Request $request)
     {
         $query = User::with(['staffProfile'])
-            ->whereIn('role', ['admin', 'caregiver', 'nurse', 'teacher'])
+            ->whereIn('role', ['admin', 'head_of_schools', 'head_of_homes', 'head_of_operations', 'caregiver', 'nurse', 'teacher'])
             ->where('is_active', true);
 
         // Apply filters
@@ -38,7 +38,15 @@ class StaffController extends Controller
 
         $staff = $query->orderBy('name')->paginate(15);
 
-        $roles = ['admin' => 'Administrator', 'caregiver' => 'Caregiver', 'nurse' => 'Nurse', 'teacher' => 'Teacher'];
+        $roles = [
+            'admin'              => 'Administrator',
+            'head_of_schools'   => 'Head of Schools',
+            'head_of_homes'     => 'Head of Homes',
+            'head_of_operations'=> 'Head of Operations',
+            'caregiver'         => 'Caregiver',
+            'nurse'             => 'Nurse',
+            'teacher'           => 'Teacher',
+        ];
 
         return view('staff.index', compact('staff', 'roles'));
     }
@@ -48,7 +56,15 @@ class StaffController extends Controller
      */
     public function create()
     {
-        $roles = ['admin' => 'Administrator', 'caregiver' => 'Caregiver', 'nurse' => 'Nurse', 'teacher' => 'Teacher'];
+        $roles = [
+            'admin'              => 'Administrator',
+            'head_of_schools'   => 'Head of Schools',
+            'head_of_homes'     => 'Head of Homes',
+            'head_of_operations'=> 'Head of Operations',
+            'caregiver'         => 'Caregiver',
+            'nurse'             => 'Nurse',
+            'teacher'           => 'Teacher',
+        ];
         return view('staff.create', compact('roles'));
     }
 
@@ -62,7 +78,7 @@ class StaffController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,caregiver,nurse,teacher',
+            'role' => 'required|in:admin,head_of_schools,head_of_homes,head_of_operations,caregiver,nurse,teacher',
             'address' => 'nullable|string',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
@@ -141,7 +157,15 @@ class StaffController extends Controller
     public function edit(User $staff)
     {
         $staff->load('staffProfile');
-        $roles = ['admin' => 'Administrator', 'caregiver' => 'Caregiver', 'nurse' => 'Nurse', 'teacher' => 'Teacher'];
+        $roles = [
+            'admin'              => 'Administrator',
+            'head_of_schools'   => 'Head of Schools',
+            'head_of_homes'     => 'Head of Homes',
+            'head_of_operations'=> 'Head of Operations',
+            'caregiver'         => 'Caregiver',
+            'nurse'             => 'Nurse',
+            'teacher'           => 'Teacher',
+        ];
         return view('staff.edit', compact('staff', 'roles'));
     }
 
@@ -155,7 +179,7 @@ class StaffController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $staff->id,
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|in:admin,caregiver,nurse,teacher',
+            'role' => 'required|in:admin,head_of_schools,head_of_homes,head_of_operations,caregiver,nurse,teacher',
             'address' => 'nullable|string',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',

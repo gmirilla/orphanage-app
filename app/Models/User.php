@@ -194,6 +194,26 @@ class User extends Authenticatable
         return $this->role === 'volunteer';
     }
 
+    public function isHeadOfSchools()
+    {
+        return $this->role === 'head_of_schools';
+    }
+
+    public function isHeadOfHomes()
+    {
+        return $this->role === 'head_of_homes';
+    }
+
+    public function isHeadOfOperations()
+    {
+        return $this->role === 'head_of_operations';
+    }
+
+    public function canAccessChildren()
+    {
+        return in_array($this->role, ['admin', 'head_of_schools', 'head_of_homes', 'head_of_operations']);
+    }
+
     // Scopes
     public function scopeActive($query)
     {
@@ -228,5 +248,20 @@ class User extends Authenticatable
     public function scopeVolunteers($query)
     {
         return $query->where('role', 'volunteer');
+    }
+
+    public function scopeHeadsOfSchools($query)
+    {
+        return $query->where('role', 'head_of_schools');
+    }
+
+    public function scopeHeadsOfHomes($query)
+    {
+        return $query->where('role', 'head_of_homes');
+    }
+
+    public function scopeHeadsOfOperations($query)
+    {
+        return $query->where('role', 'head_of_operations');
     }
 }

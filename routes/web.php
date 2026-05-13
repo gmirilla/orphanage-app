@@ -15,6 +15,8 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoomAllocationController;
+use App\Http\Controllers\StaffReportController;
+use App\Http\Controllers\RequisitionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -53,14 +55,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/analytics', [DashboardController::class, 'getAnalytics'])->name('analytics');
     Route::get('/api/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.api');
 
-    // Children Management
-    Route::resource('children', ChildController::class);
-    Route::post('children/{child}/assign-talent', [ChildController::class, 'assignTalent'])->name('children.assign-talent');
-    Route::post('children/{child}/education-record', [ChildController::class, 'addEducationRecord'])->name('children.education-record');
-    Route::post('children/{child}/record-milestone', [ChildController::class, 'recordMilestone'])->name('children.record-milestone');
-    Route::post('children/{child}/addmilestone', [ChildController::class, 'addMilestone'])->name('children.addmilestone');
-    Route::post('children/{child}/update-measurements', [ChildController::class, 'updateMeasurements'])->name('children.update-measurements');
-    Route::get('children/{child}/profile', [ChildController::class, 'profile'])->name('children.profile');
+    // Children Management (admin + head roles only)
+    Route::middleware('role:admin,head_of_schools,head_of_homes,head_of_operations')->group(function () {
+        Route::resource('children', ChildController::class);
+        Route::post('children/{child}/assign-talent', [ChildController::class, 'assignTalent'])->name('children.assign-talent');
+        Route::post('children/{child}/education-record', [ChildController::class, 'addEducationRecord'])->name('children.education-record');
+        Route::post('children/{child}/record-milestone', [ChildController::class, 'recordMilestone'])->name('children.record-milestone');
+        Route::post('children/{child}/addmilestone', [ChildController::class, 'addMilestone'])->name('children.addmilestone');
+        Route::post('children/{child}/update-measurements', [ChildController::class, 'updateMeasurements'])->name('children.update-measurements');
+        Route::get('children/{child}/profile', [ChildController::class, 'profile'])->name('children.profile');
+    });
 
     // Staff Management (Admin only)
     Route::middleware('role:admin')->group(function () {
@@ -74,10 +78,12 @@ Route::middleware('auth')->group(function () {
     Route::post('volunteers/{volunteer}/approve', [VolunteerController::class, 'approve'])->name('volunteers.approve');
     Route::post('volunteers/{volunteer}/assign-task', [VolunteerController::class, 'assignTask'])->name('volunteers.assign-task');
 
-    // Donors Management
-    Route::resource('donors', DonorController::class);
-    Route::post('donors/{donor}/add-donation', [DonorController::class, 'addDonation'])->name('donors.add-donation');
-    Route::get('donors/{donor}/donation-history', [DonorController::class, 'donationHistory'])->name('donors.donation-history');
+    // Circle of Friends Management (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('donors', DonorController::class);
+        Route::post('donors/{donor}/add-donation', [DonorController::class, 'addDonation'])->name('donors.add-donation');
+        Route::get('donors/{donor}/donation-history', [DonorController::class, 'donationHistory'])->name('donors.donation-history');
+    });
 
     // Facilities Management
     Route::resource('facilities', FacilityController::class);
@@ -107,6 +113,41 @@ Route::middleware('auth')->group(function () {
     Route::delete('maintenance/{maintenanceRequest}', [MaintenanceRequestController::class, 'destroy'])->name('maintenance.destroy');
     Route::post('maintenance/new', [MaintenanceRequestController::class, 'newRequest'])->name('maintenance.new');
 
+    // Requisitions
+    Route::prefix('requisitions')->name('requisitions.')->group(function () {
+        Route::get('/',                      [RequisitionController::class, 'index'])->name('index');
+        Route::get('/create',                [RequisitionController::class, 'create'])->name('create');
+        Route::post('/',                     [RequisitionController::class, 'store'])->name('store');
+        Route::get('/{requisition}',         [RequisitionController::class, 'show'])->name('show');
+        Route::get('/{requisition}/edit',    [RequisitionController::class, 'edit'])->name('edit');
+        Route::put('/{requisition}',         [RequisitionController::class, 'update'])->name('update');
+        Route::post('/{requisition}/submit', [RequisitionController::class, 'submit'])->name('submit');
+        Route::delete('/{requisition}',      [RequisitionController::class, 'destroy'])->name('destroy');
+        Route::get('/{requisition}/documents/{document}/download',
+            [RequisitionController::class, 'downloadDocument'])->name('documents.download');
+        Route::middleware('role:admin,head_of_operations')->group(function () {
+            Route::post('/{requisition}/approve', [RequisitionController::class, 'approve'])->name('approve');
+            Route::post('/{requisition}/reject',  [RequisitionController::class, 'reject'])->name('reject');
+        });
+    });
+
+    // Staff Reports
+    Route::prefix('staff-reports')->name('staff-reports.')->group(function () {
+        Route::get('/',                  [StaffReportController::class, 'index'])->name('index');
+        Route::get('/create',            [StaffReportController::class, 'create'])->name('create');
+        Route::post('/',                 [StaffReportController::class, 'store'])->name('store');
+        Route::get('/{staffReport}',     [StaffReportController::class, 'show'])->name('show');
+        Route::get('/{staffReport}/edit',[StaffReportController::class, 'edit'])->name('edit');
+        Route::put('/{staffReport}',     [StaffReportController::class, 'update'])->name('update');
+        Route::post('/{staffReport}/submit',   [StaffReportController::class, 'submit'])->name('submit');
+        Route::get('/{staffReport}/download',  [StaffReportController::class, 'download'])->name('download');
+        Route::delete('/{staffReport}',        [StaffReportController::class, 'destroy'])->name('destroy');
+        Route::middleware('role:admin,head_of_operations')->group(function () {
+            Route::post('/{staffReport}/approve', [StaffReportController::class, 'approve'])->name('approve');
+            Route::post('/{staffReport}/reject',  [StaffReportController::class, 'reject'])->name('reject');
+        });
+    });
+
     // Documents Management
     Route::resource('documents', DocumentController::class);
     Route::post('documents/upload', [DocumentController::class, 'upload'])->name('documents.upload');
@@ -133,11 +174,15 @@ Route::middleware('auth')->group(function () {
 
     // API routes
     Route::prefix('api')->name('api.')->group(function () {
-        Route::get('children/search', [ChildController::class, 'search'])->name('children.search');
-        Route::get('children/stats', [ChildController::class, 'getStatistics'])->name('children.stats');
+        Route::middleware('role:admin,head_of_schools,head_of_homes,head_of_operations')->group(function () {
+            Route::get('children/search', [ChildController::class, 'search'])->name('children.search');
+            Route::get('children/stats', [ChildController::class, 'getStatistics'])->name('children.stats');
+        });
+        Route::middleware('role:admin')->group(function () {
+            Route::get('donors/search', [DonorController::class, 'search'])->name('donors.search');
+            Route::get('donors/stats', [DonorController::class, 'getStats'])->name('donations.stats');
+        });
         Route::get('volunteers/search', [VolunteerController::class, 'search'])->name('volunteers.search');
-        Route::get('donors/search', [DonorController::class, 'search'])->name('donors.search');
-        Route::get('donors/stats', [DonorController::class, 'getStats'])->name('donations.stats');
         Route::get('facilities/search', [FacilityController::class, 'search'])->name('facilities.search');
         Route::get('maintenance/stats', [MaintenanceRequestController::class, 'getStats'])->name('maintenance.stats');
         Route::get('dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');

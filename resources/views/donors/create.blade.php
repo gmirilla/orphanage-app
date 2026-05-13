@@ -1,8 +1,8 @@
 <x-layouts.app>
 <div class="max-w-2xl mx-auto space-y-6">
     <div>
-        <h2 class="text-2xl font-bold text-neutral-900">Add Donor</h2>
-        <p class="text-sm text-neutral-600">Register a new donor</p>
+        <h2 class="text-2xl font-bold text-neutral-900">Add to Circle of Friends</h2>
+        <p class="text-sm text-neutral-600">Register a new Circle of Friends member</p>
     </div>
 
     @if($errors->any())

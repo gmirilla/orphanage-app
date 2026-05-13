@@ -60,7 +60,7 @@ class ChildController extends Controller
 
     public function create()
     {
-        $staff = \App\Models\User::whereIn('role', ['admin', 'caregiver'])->get();
+        $staff = \App\Models\User::whereIn('role', ['admin', 'head_of_schools', 'head_of_homes', 'head_of_operations', 'caregiver'])->get();
         $dormitories = Facility::where('type', 'dormitory')->where('is_active', true)->orderBy('name')->get();
         return view('children.create', compact('staff', 'dormitories'));
     }
@@ -136,7 +136,7 @@ class ChildController extends Controller
     public function edit(Child $child)
     {
         $child->load(['admissionLog', 'currentRoomAssignment.roomAllocation.facility']);
-        $staff = \App\Models\User::whereIn('role', ['admin', 'caregiver'])->get();
+        $staff = \App\Models\User::whereIn('role', ['admin', 'head_of_schools', 'head_of_homes', 'head_of_operations', 'caregiver'])->get();
         $dormitories = Facility::where('type', 'dormitory')->where('is_active', true)->orderBy('name')->get();
         return view('children.edit', compact('child', 'staff', 'dormitories'));
     }
