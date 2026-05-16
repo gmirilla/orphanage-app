@@ -39,9 +39,16 @@ class ChildController extends Controller
             $query->where('is_active', true);
         }
 
-        $children = $query->orderBy('created_at', 'desc')->paginate(20);
+        $children = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
-        return view('children.index', compact('children'));
+        $stats = [
+            'total'  => Child::count(),
+            'boys'   => Child::where('gender', 'male')->count(),
+            'girls'  => Child::where('gender', 'female')->count(),
+            'recent' => Child::where('admission_date', '>=', now()->subMonths(3))->count(),
+        ];
+
+        return view('children.index', compact('children', 'stats'));
     }
 
     public function show(Child $child)

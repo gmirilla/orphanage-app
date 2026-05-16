@@ -1,8 +1,13 @@
 <x-layouts.app>
 <div class="max-w-2xl mx-auto space-y-6">
-    <div>
-        <h2 class="text-2xl font-bold text-neutral-900">New Maintenance Request</h2>
-        <p class="text-sm text-neutral-600">Submit a new maintenance request</p>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('maintenance.index') }}" class="text-neutral-400 hover:text-neutral-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h2 class="text-2xl font-bold text-neutral-900">New Maintenance Request</h2>
+            <p class="text-sm text-neutral-500">Submit a new maintenance request</p>
+        </div>
     </div>
 
     @if($errors->any())

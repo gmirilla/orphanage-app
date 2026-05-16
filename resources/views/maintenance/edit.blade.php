@@ -1,190 +1,122 @@
-@section('title', 'Edit Maintenance Request')
-
 <x-layouts.app>
-    <div>
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+@php
+    $isPrivileged = in_array(auth()->user()->role, ['admin', 'head_of_operations', 'head_of_schools', 'head_of_homes']);
+@endphp
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <div class="flex items-center gap-3">
+        <a href="{{ route('maintenance.view', $maintenanceRequest) }}" class="text-neutral-400 hover:text-neutral-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h2 class="text-2xl font-bold text-neutral-900">Edit Request</h2>
+            <p class="text-sm text-neutral-500">{{ $maintenanceRequest->facility->name }} · #{{ $maintenanceRequest->id }}</p>
+        </div>
     </div>
-    <div class="container">
-        <div class="bg-white rounded-lg shadow-md border border-neutral-100">
-            <div class="p-4 rounded-t-lg">
 
-                <h2>Maintenance Request : for {{ $maintenanceRequest->facility->name }}</h2>
-                <form action="{{route('maintenance.update_status', $maintenanceRequest->id)}}" method="post">
-                    @csrf
- 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="list-disc pl-4 space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+        </div>
+    @endif
 
-                <!-- REQUEST TITLE -->
-                <div class="mb-3">
-                    <label for="title" class="form-label" required><b>Title</b></label>
-                    <input type="text" name="title" id="title" class="form-input"
-                        value="{{ old('title', $maintenanceRequest->title) }}" disabled>
-                    @error('title')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+    {{-- Read-only context --}}
+    <div class="bg-[#324b45]/5 border border-[#324b45]/20 rounded-xl p-4">
+        <p class="text-sm font-semibold text-[#324b45]">{{ $maintenanceRequest->title }}</p>
+        <p class="text-xs text-neutral-600 mt-1 line-clamp-2">{{ $maintenanceRequest->description }}</p>
+        <p class="text-xs text-neutral-500 mt-2">Submitted by {{ $maintenanceRequest->requestedBy->name }} on {{ \Carbon\Carbon::parse($maintenanceRequest->requested_date)->format('d M Y') }}</p>
+    </div>
+
+    <form action="{{ route('maintenance.update_status', $maintenanceRequest) }}" method="POST" class="space-y-5">
+        @csrf
+
+        {{-- Status & Priority --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Status & Priority</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Status <span class="text-red-500">*</span></label>
+                    <select name="status" class="form-input w-full" required>
+                        <option value="pending"     {{ old('status', $maintenanceRequest->status) === 'pending'     ? 'selected' : '' }}>Pending</option>
+                        <option value="in_progress" {{ old('status', $maintenanceRequest->status) === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                        <option value="completed"   {{ old('status', $maintenanceRequest->status) === 'completed'   ? 'selected' : '' }}>Completed</option>
+                        <option value="cancelled"   {{ old('status', $maintenanceRequest->status) === 'cancelled'   ? 'selected' : '' }}>Cancelled</option>
+                    </select>
+                    @error('status')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
-                <!-- REQUEST Priority -->
-                <div class="mb-3 flex justify-between">
-                    <div>
-                        <label for="requested_by" class="form-label" required>Requested By:</label>
-                        <input type="text" name="requested_by" id="requested_by" class="form-input"
-                            value="{{ old('requested_by', $maintenanceRequest->requestedBy->name) }}" disabled>
-                        @error('requested_by')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="priority" class="form-label" required>Priority</label>
-                        <select name="priority" id="priority" class="form-input">
-                            <option value="low"
-                                {{ old('priority', $maintenanceRequest->priority) == 'low' ? 'selected' : '' }}>Low
-                            </option>
-                            <option value="medium"
-                                {{ old('priority', $maintenanceRequest->priority) == 'medium' ? 'selected' : '' }}>
-                                Medium</option>
-                            <option value="high"
-                                {{ old('priority', $maintenanceRequest->priority) == 'high' ? 'selected' : '' }}>High
-                            </option>
-                            <option value="urgent"
-                                {{ old('priority', $maintenanceRequest->priority) == 'urgent' ? 'selected' : '' }}>
-                                Urgent</option>
-                        </select>
-
-                        @error('priority')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="status" class="form-label" required>Status</label>
-                        <select name="status" id="status" class="form-input">
-                            <option value="pending"
-                                {{ old('status', $maintenanceRequest->status) == 'pending' ? 'selected' : '' }}>Pending
-                            </option>
-                            <option value="in_progress"
-                                {{ old('status', $maintenanceRequest->status) == 'in_progress' ? 'selected' : '' }}>In
-                                Progress</option>
-                            <option value="completed"
-                                {{ old('status', $maintenanceRequest->status) == 'completed' ? 'selected' : '' }}>
-                                Completed</option>
-                            <option value="cancelled"
-                                {{ old('status', $maintenanceRequest->status) == 'cancelled' ? 'selected' : '' }}>
-                                Cancelled</option>
-                        </select>
-                        @error('status')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="requested_date" class="form-label" required>Requested Date</label>
-                        <input type="text" name="requested_date" id="requested_date" class="form-input"
-                            value="{{ old('requested_date', $maintenanceRequest->requested_date) }}" disabled>
-                        @error('requested_date')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-
+                <div>
+                    <label class="form-label">Priority <span class="text-red-500">*</span></label>
+                    <select name="priority" class="form-input w-full" required>
+                        <option value="low"    {{ old('priority', $maintenanceRequest->priority) === 'low'    ? 'selected' : '' }}>Low</option>
+                        <option value="medium" {{ old('priority', $maintenanceRequest->priority) === 'medium' ? 'selected' : '' }}>Medium</option>
+                        <option value="high"   {{ old('priority', $maintenanceRequest->priority) === 'high'   ? 'selected' : '' }}>High</option>
+                        <option value="urgent" {{ old('priority', $maintenanceRequest->priority) === 'urgent' ? 'selected' : '' }}>Urgent</option>
+                    </select>
+                    @error('priority')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
-
-                <!-- REQUEST description -->
-                <div class="mb-3">
-                    <label for="description" class="form-label" required>Description</label>
-                    <textarea class="form-input" name="description" id="description" cols="30" rows="5" disabled>{{ old('description', $maintenanceRequest->description) }}</textarea>
-                    @error('description')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- REQUEST reolution/note -->
-                <div class="mb-3">
-                    <label for="resolution" class="form-label" required>Resolution</label>
-                    <textarea class="form-input" name="resolution" id="resolution" cols="30" rows="5">{{ old('resolution', $maintenanceRequest->resolution) }}</textarea>
-                    @error('resolution')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-                <!-- REQUEST Priority -->
-                <div class="mb-3 flex justify-between">
-                    <div>
-                        <label for="assigned_to" class="form-label" required>Assigned To</label>
-                        <select class="form-input" name="assigned_to" id="assigned_to">
-                            <option value=""> -- Select Staff --</option>
-                            @forelse ($users as $user)
-                                <option value="{{ $user->id }}"
-                                    {{ old('assigned_to', $maintenanceRequest->assigned_to) == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }}
-                                </option>
-                                
-                            @empty
-                                
-                            @endforelse
-                        </select>
-                        @error('assigned_to')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="due_date" class="form-label" required>Due Date</label>
-                        <input type="date" name="due_date" id="due_date" class="form-input"
-                            value="{{ old('due_date',($maintenanceRequest->due_date)) }}">
-                        @error('due_date')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="estimated_cost" class="form-label" required>Estimated Cost</label>
-                        <input type="text" name="estimated_cost" id="estimated_cost" class="form-input"
-                            value="{{ old('estimated_cost', $maintenanceRequest->estimated_cost) }}">
-                        @error('estimated_cost')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="actual_cost" class="form-label" required>Actual Cost</label>
-                        <input type="text" name="actual_cost" id="actual_cost" class="form-input"
-                            value="{{ old('actual_cost', $maintenanceRequest->actual_cost) }}">
-                        @error('actual_cost')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-                    <div>
-                        <label for="completed_date" class="form-label" required>Completed Date</label>
-                        <input type="date" name="completed_date" id="completed_date" class="form-input"
-                            value="{{ old('completed_date', $maintenanceRequest->completed_date) }}"  disabled>
-                        @error('completed_date')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-
-                </div>
-
-                <div class="mb-3 flex justify-end">
-                    <button type="submit" class="btn btn-secondary mr-4"><i
-                            class="fa fa-save"></i> Update Request</button>
-
-                    <a href="{{ route('maintenance.edit_request', $maintenanceRequest->id) }}"
-                        class="btn btn-success"><i class="fa fa-edit"></i> Edit Request</a>
-
-                </div>
-                               </form>
             </div>
         </div>
 
+        {{-- Assignment & Scheduling --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Assignment & Scheduling</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Assign To</label>
+                    <select name="assigned_to" class="form-input w-full">
+                        <option value="">— Unassigned —</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}" {{ old('assigned_to', $maintenanceRequest->assigned_to) == $user->id ? 'selected' : '' }}>
+                                {{ $user->name }} ({{ ucfirst(str_replace('_', ' ', $user->role)) }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('assigned_to')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Due Date</label>
+                    <input type="date" name="due_date" value="{{ old('due_date', $maintenanceRequest->due_date) }}" class="form-input w-full">
+                    @error('due_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
+        </div>
 
+        {{-- Costs --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Cost Tracking</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Estimated Cost</label>
+                    <input type="number" name="estimated_cost" step="0.01" min="0"
+                           value="{{ old('estimated_cost', $maintenanceRequest->estimated_cost) }}"
+                           class="form-input w-full" placeholder="0.00">
+                    @error('estimated_cost')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Actual Cost</label>
+                    <input type="number" name="actual_cost" step="0.01" min="0"
+                           value="{{ old('actual_cost', $maintenanceRequest->actual_cost) }}"
+                           class="form-input w-full" placeholder="0.00">
+                    @error('actual_cost')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
+        </div>
 
+        {{-- Resolution --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Resolution / Notes</h3>
+            <textarea name="resolution" rows="4" class="form-input w-full"
+                      placeholder="Document steps taken, findings, or resolution notes…">{{ old('resolution', $maintenanceRequest->resolution) }}</textarea>
+            @error('resolution')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        {{-- Actions --}}
+        <div class="flex items-center justify-between">
+            <a href="{{ route('maintenance.view', $maintenanceRequest) }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="save" class="w-4 h-4 mr-1 inline-block"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
 </x-layouts.app>

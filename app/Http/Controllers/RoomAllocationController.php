@@ -12,15 +12,30 @@ use Illuminate\Support\Facades\Log;
 
 class RoomAllocationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = RoomAllocation::with('facility')
-            ->withCount(['childAssignments as current_occupants' => fn($q) => $q->whereNull('unassigned_date')])
-            ->orderBy('facility_id')
-            ->orderBy('room_number')
-            ->paginate(20);
+        $query = RoomAllocation::with('facility')
+            ->withCount(['childAssignments as current_occupants' => fn($q) => $q->whereNull('unassigned_date')]);
 
-        return view('rooms.index', compact('rooms'));
+        if ($request->filled('facility')) {
+            $query->where('facility_id', $request->facility);
+        }
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        $rooms = $query->orderBy('facility_id')->orderBy('room_number')->paginate(20)->withQueryString();
+
+        $stats = [
+            'total'      => RoomAllocation::count(),
+            'active'     => RoomAllocation::where('is_active', true)->count(),
+            'total_beds' => RoomAllocation::sum('bed_count'),
+            'occupied'   => RoomAllocation::sum('occupied_beds'),
+        ];
+
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return view('rooms.index', compact('rooms', 'stats', 'facilities'));
     }
 
     public function create(Request $request)

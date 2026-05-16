@@ -1,312 +1,206 @@
-
-@section('title', 'Add New Child')
-
 <x-layouts.app>
-<div class="container">
-    <div class="bg-white rounded-lg shadow-md border border-neutral-100">
-        <div class="p-6 border-b border-neutral-200">
-            <h1 class="text-2xl font-bold text-neutral-900">Add New Child</h1>
-            <p class="text-sm text-neutral-600 mt-1">Create a new child profile with all necessary information</p>
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <div class="flex items-center gap-3">
+        <a href="{{ route('children.index') }}" class="text-neutral-400 hover:text-neutral-600 transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h2 class="text-2xl font-bold text-neutral-900">Add New Child</h2>
+            <p class="text-sm text-neutral-500">Create a new child profile</p>
+        </div>
+    </div>
+
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="list-disc pl-4 space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+        </div>
+    @endif
+
+    <form action="{{ route('children.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+        @csrf
+
+        {{-- Personal Information --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Personal Information</h3>
+
+            <div>
+                <label class="form-label">Full Name <span class="text-red-500">*</span></label>
+                <input type="text" name="name" value="{{ old('name') }}" required class="form-input w-full" placeholder="Enter full name">
+                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Gender <span class="text-red-500">*</span></label>
+                    <select name="gender" required class="form-input w-full">
+                        <option value="">Select gender…</option>
+                        <option value="male"   {{ old('gender') === 'male'   ? 'selected' : '' }}>Male</option>
+                        <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
+                        <option value="other"  {{ old('gender') === 'other'  ? 'selected' : '' }}>Other</option>
+                    </select>
+                    @error('gender')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Date of Birth <span class="text-red-500">*</span></label>
+                    <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" required
+                           max="{{ date('Y-m-d') }}" class="form-input w-full">
+                    @error('date_of_birth')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Blood Group</label>
+                    <select name="blood_group" class="form-input w-full">
+                        <option value="">Unknown</option>
+                        @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $bg)
+                            <option value="{{ $bg }}" {{ old('blood_group') === $bg ? 'selected' : '' }}>{{ $bg }}</option>
+                        @endforeach
+                    </select>
+                    @error('blood_group')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Profile Photo</label>
+                    <input type="file" name="profile_photo" accept="image/*" class="form-input w-full">
+                    <p class="text-xs text-neutral-500 mt-1">JPEG, PNG, JPG, GIF — max 2 MB</p>
+                    @error('profile_photo')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Height (cm)</label>
+                    <input type="number" name="height_cm" value="{{ old('height_cm') }}"
+                           step="0.1" min="0" max="300" class="form-input w-full" placeholder="e.g. 120">
+                    @error('height_cm')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" name="weight_kg" value="{{ old('weight_kg') }}"
+                           step="0.1" min="0" max="200" class="form-input w-full" placeholder="e.g. 35">
+                    @error('weight_kg')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
         </div>
 
-        <form action="{{ route('children.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
-            @csrf
-
-            <!-- Personal Information -->
-            <div>
-                <h3 class="text-lg font-semibold text-neutral-900 mb-4">Personal Information</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <label for="name" class="form-label">Full Name <span class="text-red-500">*</span></label>
-                        <input type="text" 
-                               id="name" 
-                               name="name" 
-                               value="{{ old('name') }}" 
-                               required
-                               class="form-input @error('name') border-red-500 @enderror w-full">
-                        @error('name')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="gender" class="form-label">Gender <span class="text-red-500">*</span></label>
-                        <select id="gender" 
-                                name="gender" 
-                                required
-                                class="form-input @error('gender') border-red-500 @enderror w-full">
-                            <option value="">Select Gender</option>
-                            <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
-                            <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
-                            <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
-                        </select>
-                        @error('gender')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="date_of_birth" class="form-label">Date of Birth <span class="text-red-500">*</span></label>
-                        <input type="date" 
-                               id="date_of_birth" 
-                               name="date_of_birth" 
-                               value="{{ old('date_of_birth') }}" 
-                               required
-                               max="{{ date('Y-m-d') }}"
-                               class="form-input @error('date_of_birth') border-red-500 @enderror w-full">
-                        @error('date_of_birth')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="blood_group" class="form-label">Blood Group</label>
-                        <select id="blood_group" 
-                                name="blood_group" 
-                                class="form-input @error('blood_group') border-red-500 @enderror w-full">
-                            <option value="">Select Blood Group</option>
-                            <option value="A+" {{ old('blood_group') === 'A+' ? 'selected' : '' }}>A+</option>
-                            <option value="A-" {{ old('blood_group') === 'A-' ? 'selected' : '' }}>A-</option>
-                            <option value="B+" {{ old('blood_group') === 'B+' ? 'selected' : '' }}>B+</option>
-                            <option value="B-" {{ old('blood_group') === 'B-' ? 'selected' : '' }}>B-</option>
-                            <option value="AB+" {{ old('blood_group') === 'AB+' ? 'selected' : '' }}>AB+</option>
-                            <option value="AB-" {{ old('blood_group') === 'AB-' ? 'selected' : '' }}>AB-</option>
-                            <option value="O+" {{ old('blood_group') === 'O+' ? 'selected' : '' }}>O+</option>
-                            <option value="O-" {{ old('blood_group') === 'O-' ? 'selected' : '' }}>O-</option>
-                        </select>
-                        @error('blood_group')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="height_cm" class="form-label">Height (cm)</label>
-                        <input type="number" 
-                               id="height_cm" 
-                               name="height_cm" 
-                               value="{{ old('height_cm') }}" 
-                               step="0.1"
-                               min="0"
-                               max="300"
-                               class="form-input @error('height_cm') border-red-500 @enderror w-full">
-                        @error('height_cm')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="weight_kg" class="form-label">Weight (kg)</label>
-                        <input type="number" 
-                               id="weight_kg" 
-                               name="weight_kg" 
-                               value="{{ old('weight_kg') }}" 
-                               step="0.1"
-                               min="0"
-                               max="200"
-                               class="form-input @error('weight_kg') border-red-500 @enderror w-full">
-                        @error('weight_kg')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label for="profile_photo" class="form-label">Profile Photo</label>
-                        <input type="file" 
-                               id="profile_photo" 
-                               name="profile_photo" 
-                               accept="image/*"
-                               class="form-input @error('profile_photo') border-red-500 @enderror w-full">
-                        <p class="text-sm text-neutral-600 mt-1">Upload a clear photo (JPEG, PNG, JPG, GIF - max 2MB)</p>
-                        @error('profile_photo')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
+        {{-- Admission Information --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Admission Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Admission Date <span class="text-red-500">*</span></label>
+                    <input type="date" name="admission_date" value="{{ old('admission_date') }}" required class="form-input w-full">
+                    @error('admission_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Admission Source <span class="text-red-500">*</span></label>
+                    <select name="admission_source" required class="form-input w-full">
+                        <option value="">Select source…</option>
+                        @foreach(['hospital' => 'Hospital', 'social_services' => 'Social Services', 'family_services' => 'Family Services', 'police' => 'Police', 'other' => 'Other'] as $val => $label)
+                            <option value="{{ $val }}" {{ old('admission_source') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('admission_source')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Guardianship Status</label>
+                    <select name="guardianship_status" class="form-input w-full">
+                        <option value="">Unknown</option>
+                        @foreach(['orphan' => 'Orphan', 'abandoned' => 'Abandoned', 'dependent' => 'Dependent', 'temporary_care' => 'Temporary Care'] as $val => $label)
+                            <option value="{{ $val }}" {{ old('guardianship_status') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('guardianship_status')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Admitted By <span class="text-red-500">*</span></label>
+                    <select name="admitted_by" required class="form-input w-full">
+                        <option value="">Select staff member…</option>
+                        @foreach($staff as $member)
+                            <option value="{{ $member->id }}" {{ old('admitted_by') == $member->id ? 'selected' : '' }}>
+                                {{ $member->name }} ({{ ucfirst(str_replace('_', ' ', $member->role)) }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('admitted_by')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
+        </div>
 
-            <!-- Admission Information -->
+        {{-- Background & Medical --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Background & Medical</h3>
             <div>
-                <h3 class="text-lg font-semibold text-neutral-900 mb-4">Admission Information</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="admission_date" class="form-label">Admission Date <span class="text-red-500">*</span></label>
-                        <input type="date" 
-                               id="admission_date" 
-                               name="admission_date" 
-                               value="{{ old('admission_date') }}" 
-                               required
-                               class="form-input @error('admission_date') border-red-500 @enderror w-full">
-                        @error('admission_date')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <label class="form-label">Background Summary <span class="text-red-500">*</span></label>
+                <textarea name="background_summary" rows="4" required class="form-input w-full"
+                          placeholder="Family situation, circumstances leading to admission, relevant history…">{{ old('background_summary') }}</textarea>
+                @error('background_summary')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="form-label">Special Needs</label>
+                <textarea name="special_needs" rows="2" class="form-input w-full"
+                          placeholder="Any medical, educational, or behavioral needs…">{{ old('special_needs') }}</textarea>
+                @error('special_needs')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="form-label">Guardian Information</label>
+                <textarea name="guardian_info" rows="2" class="form-input w-full"
+                          placeholder="Parents, guardians, or next of kin contact details…">{{ old('guardian_info') }}</textarea>
+                @error('guardian_info')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+        </div>
 
-                    <div>
-                        <label for="admission_source" class="form-label">Admission Source <span class="text-red-500">*</span></label>
-                        <select id="admission_source" 
-                                name="admission_source" 
-                                required
-                                class="form-input @error('admission_source') border-red-500 @enderror w-full">
-                            <option value="">Select Source</option>
-                            <option value="hospital" {{ old('admission_source') === 'hospital' ? 'selected' : '' }}>Hospital</option>
-                            <option value="social_services" {{ old('admission_source') === 'social_services' ? 'selected' : '' }}>Social Services</option>
-                            <option value="family_services" {{ old('admission_source') === 'family_services' ? 'selected' : '' }}>Family Services</option>
-                            <option value="police" {{ old('admission_source') === 'police' ? 'selected' : '' }}>Police</option>
-                            <option value="other" {{ old('admission_source') === 'other' ? 'selected' : '' }}>Other</option>
-                        </select>
-                        @error('admission_source')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="guardianship_status" class="form-label">Guardianship Status</label>
-                        <select id="guardianship_status" 
-                                name="guardianship_status" 
-                                class="form-input @error('guardianship_status') border-red-500 @enderror w-full">
-                            <option value="">Select Status</option>
-                            <option value="orphan" {{ old('guardianship_status') === 'orphan' ? 'selected' : '' }}>Orphan</option>
-                            <option value="abandoned" {{ old('guardianship_status') === 'abandoned' ? 'selected' : '' }}>Abandoned</option>
-                            <option value="dependent" {{ old('guardianship_status') === 'dependent' ? 'selected' : '' }}>Dependent</option>
-                            <option value="temporary_care" {{ old('guardianship_status') === 'temporary_care' ? 'selected' : '' }}>Temporary Care</option>
-                        </select>
-                        @error('guardianship_status')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="admitted_by" class="form-label">Admitted By <span class="text-red-500">*</span></label>
-                        <select id="admitted_by" 
-                                name="admitted_by" 
-                                required
-                                class="form-input @error('admitted_by') border-red-500 @enderror w-full">
-                            <option value="">Select Staff Member</option>
-                            @foreach($staff as $member)
-                                <option value="{{ $member->id }}" {{ old('admitted_by') == $member->id ? 'selected' : '' }}>
-                                    {{ $member->name }} ({{ ucfirst($member->role) }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('admitted_by')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
+        {{-- Room Assignment (Optional) --}}
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-neutral-100 space-y-4">
+            <div>
+                <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Room Assignment</h3>
+                <p class="text-xs text-neutral-500 mt-0.5">Optional — can be set later from the room view</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Dormitory Facility</label>
+                    <select id="facility_id" name="facility_id" class="form-input w-full" onchange="loadRooms(this.value)">
+                        <option value="">— Select a dormitory —</option>
+                        @foreach($dormitories as $dorm)
+                            <option value="{{ $dorm->id }}" {{ old('facility_id') == $dorm->id ? 'selected' : '' }}>{{ $dorm->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Room</label>
+                    <select id="room_allocation_id" name="room_allocation_id" class="form-input w-full" disabled>
+                        <option value="">— Select a facility first —</option>
+                    </select>
+                    @error('room_allocation_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
+        </div>
 
-            <!-- Background and Medical Information -->
-            <div>
-                <h3 class="text-lg font-semibold text-neutral-900 mb-4">Background & Medical Information</h3>
-                <div class="space-y-6">
-                    <div>
-                        <label for="background_summary" class="form-label">Background Summary <span class="text-red-500">*</span></label>
-                        <textarea id="background_summary" 
-                                  name="background_summary" 
-                                  rows="4" 
-                                  required
-                                  placeholder="Provide a comprehensive background summary including family situation, circumstances leading to admission, and any relevant history..."
-                                  class="form-input @error('background_summary') border-red-500 @enderror w-full">{{ old('background_summary') }}</textarea>
-                        @error('background_summary')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="special_needs" class="form-label">Special Needs</label>
-                        <textarea id="special_needs" 
-                                  name="special_needs" 
-                                  rows="3" 
-                                  placeholder="Any special medical, educational, or behavioral needs..."
-                                  class="form-input @error('special_needs') border-red-500 @enderror w-full">{{ old('special_needs') }}</textarea>
-                        @error('special_needs')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="guardian_info" class="form-label">Guardian Information</label>
-                        <textarea id="guardian_info" 
-                                  name="guardian_info" 
-                                  rows="3" 
-                                  placeholder="Information about parents, guardians, or next of kin (if applicable)..."
-                                  class="form-input @error('guardian_info') border-red-500 @enderror w-full">{{ old('guardian_info') }}</textarea>
-                        @error('guardian_info')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            <!-- Room Assignment -->
-            <div>
-                <h3 class="text-lg font-semibold text-neutral-900 mb-4">Room Assignment <span class="text-sm font-normal text-neutral-500">(Optional)</span></h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="facility_id" class="form-label">Dormitory Facility</label>
-                        <select id="facility_id" name="facility_id" class="form-input w-full" onchange="loadRooms(this.value)">
-                            <option value="">— Select a dormitory —</option>
-                            @foreach($dormitories as $dorm)
-                                <option value="{{ $dorm->id }}" {{ old('facility_id') == $dorm->id ? 'selected' : '' }}>
-                                    {{ $dorm->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="room_allocation_id" class="form-label">Room</label>
-                        <select id="room_allocation_id" name="room_allocation_id" class="form-input w-full" disabled>
-                            <option value="">— Select a facility first —</option>
-                        </select>
-                        @error('room_allocation_id')
-                            <p class="error-message">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex justify-end space-x-4 pt-6 border-t border-neutral-200">
-                <a href="{{ route('children.index') }}" class="btn btn-secondary">
-                    <i data-lucide="x" class="w-4 h-4 mr-2"></i>
-                    Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="w-4 h-4 mr-2"></i>
-                    Create Child Profile
-                </button>
-            </div>
-        </form>
-    </div>
+        {{-- Actions --}}
+        <div class="flex items-center justify-between">
+            <a href="{{ route('children.index') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="user-plus" class="w-4 h-4 mr-1 inline-block"></i> Create Child Profile
+            </button>
+        </div>
+    </form>
 </div>
 
 <script>
-const roomsJsonUrl = (facilityId) => `/facilities/${facilityId}/rooms-json`;
-
 async function loadRooms(facilityId) {
     const roomSelect = document.getElementById('room_allocation_id');
-    roomSelect.innerHTML = '<option value="">Loading...</option>';
+    roomSelect.innerHTML = '<option value="">Loading…</option>';
     roomSelect.disabled = true;
-
     if (!facilityId) {
         roomSelect.innerHTML = '<option value="">— Select a facility first —</option>';
         return;
     }
-
-    const res = await fetch(roomsJsonUrl(facilityId));
+    const res = await fetch(`/facilities/${facilityId}/rooms-json`);
     const rooms = await res.json();
-
     if (rooms.length === 0) {
         roomSelect.innerHTML = '<option value="">No available rooms</option>';
         return;
     }
-
     roomSelect.innerHTML = '<option value="">— Select a room —</option>' +
         rooms.map(r => `<option value="${r.id}">${r.room_number} (${r.available_beds} bed${r.available_beds !== 1 ? 's' : ''} free)</option>`).join('');
     roomSelect.disabled = false;
 }
 
-// Re-populate on page load if old() values exist (after validation failure)
 document.addEventListener('DOMContentLoaded', function () {
     const facilitySelect = document.getElementById('facility_id');
     const oldRoom = '{{ old('room_allocation_id') }}';
@@ -317,48 +211,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-
-@push('scripts')
-<script>
-// Calculate and display age
-document.getElementById('date_of_birth').addEventListener('change', function() {
-    const birthDate = new Date(this.value);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-    
-    if (age >= 0) {
-        console.log(`Age: ${age} years`);
-    }
-});
-
-// Validate admission date
-document.getElementById('admission_date').addEventListener('change', function() {
-    const birthDate = new Date(document.getElementById('date_of_birth').value);
-    const admissionDate = new Date(this.value);
-    
-    if (admissionDate <= birthDate) {
-        alert('Admission date must be after the date of birth.');
-        this.value = '';
-    }
-});
-
-// Preview profile photo
-document.getElementById('profile_photo').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // You can display a preview here if needed
-            console.log('Photo selected:', file.name, file.size);
-        };
-        reader.readAsDataURL(file);
-    }
-});
-</script>
-@endpush
 </x-layouts.app>

@@ -1,233 +1,212 @@
-
-@section('title', 'Maintenance Management')
-
 <x-layouts.app>
-            <div>
-  @if ($errors->any())
-  <div class="alert alert-danger">
-      <ul>
-          @foreach ($errors->all() as $error)
-              <li>{{ $error }}</li>
-          @endforeach
-      </ul>
-  </div>
-@endif
-</div>
 <div class="space-y-6">
-    <!-- Header with Actions -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-            <h2 class="text-2xl font-bold text-neutral-900">Maintenance Management</h2>
-            <p class="text-sm text-neutral-600">Manage Maintenance records</p>
+            <h2 class="text-2xl font-bold text-neutral-900">Maintenance Requests</h2>
+            <p class="text-sm text-neutral-500">Track and manage facility maintenance work orders</p>
         </div>
-        <div class="mt-4 sm:mt-0">
-            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
-                <i class="fa fa-plus mr-2"></i>
-                Add New Request
-            </a>
+        <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
+            <i data-lucide="plus" class="w-4 h-4 mr-2 inline-block"></i> New Request
+        </a>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    {{-- Stats --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-neutral-100 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-[#324b45]/10 flex items-center justify-center shrink-0">
+                <i data-lucide="wrench" class="w-5 h-5 text-[#324b45]"></i>
+            </div>
+            <div>
+                <p class="text-xs text-neutral-500 leading-tight">Total Requests</p>
+                <p class="text-2xl font-bold text-neutral-900 leading-tight">{{ $stats['total'] }}</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-neutral-100 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
+            </div>
+            <div>
+                <p class="text-xs text-neutral-500 leading-tight">Pending</p>
+                <p class="text-2xl font-bold text-amber-700 leading-tight">{{ $stats['pending'] }}</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-neutral-100 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                <i data-lucide="loader" class="w-5 h-5 text-blue-600"></i>
+            </div>
+            <div>
+                <p class="text-xs text-neutral-500 leading-tight">In Progress</p>
+                <p class="text-2xl font-bold text-blue-700 leading-tight">{{ $stats['in_progress'] }}</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-neutral-100 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i>
+            </div>
+            <div>
+                <p class="text-xs text-neutral-500 leading-tight">Urgent Open</p>
+                <p class="text-2xl font-bold text-red-700 leading-tight">{{ $stats['urgent'] }}</p>
+            </div>
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-lg p-6 shadow-md border border-neutral-100">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-                <label for="search" class="form-label">Search facility</label>
-                <input type="text" 
-                       id="search"
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Search by name..."
-                       class="form-input w-full">
+    {{-- Filters --}}
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-neutral-100">
+        <form method="GET" class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[160px]">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       placeholder="Search by title or facility…" class="form-input w-full">
             </div>
-            
-            <div>
-                <label for="type" class="form-label"> Priority</label>
-                <select id="type" name="type" class="form-input w-full">
-                    <option value="">All Level</option>
-                    @forelse ($plevels as $type )
-                        <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
-                    @empty
-                    <option value="" disabled> No types available</option>
-                        
-                    @endforelse
+            <div class="w-36">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-input w-full">
+                    <option value="">All</option>
+                    <option value="low"    {{ request('priority') === 'low'    ? 'selected' : '' }}>Low</option>
+                    <option value="medium" {{ request('priority') === 'medium' ? 'selected' : '' }}>Medium</option>
+                    <option value="high"   {{ request('priority') === 'high'   ? 'selected' : '' }}>High</option>
+                    <option value="urgent" {{ request('priority') === 'urgent' ? 'selected' : '' }}>Urgent</option>
                 </select>
             </div>
-            
-            <div>
-                <label for="status" class="form-label">Status</label>
-                <select id="status" name="status" class="form-input w-full">
-                    <option value="">All facilities</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+            <div class="w-40">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-input w-full">
+                    <option value="">All</option>
+                    <option value="pending"     {{ request('status') === 'pending'     ? 'selected' : '' }}>Pending</option>
+                    <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                    <option value="completed"   {{ request('status') === 'completed'   ? 'selected' : '' }}>Completed</option>
+                    <option value="cancelled"   {{ request('status') === 'cancelled'   ? 'selected' : '' }}>Cancelled</option>
                 </select>
             </div>
-            
-            <div class="flex items-end space-x-2">
+            <div class="flex gap-2">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-filter mr-2"></i>
-                    Filter
+                    <i data-lucide="filter" class="w-4 h-4 mr-1 inline-block"></i> Filter
                 </button>
-                <a href="{{ route('facilities.index') }}" class="btn btn-secondary mx-2">
-                    <i class="fa fa-times mr-2"></i>
-                    Clear
-                </a>
+                <a href="{{ route('maintenance.index') }}" class="btn btn-secondary">Clear</a>
             </div>
         </form>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
-            <div class="flex items-center">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+    {{-- Request Cards --}}
+    @if($requests->count())
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        @foreach($requests as $req)
+        @php
+            $priorityStripe = match($req->priority) {
+                'urgent' => 'bg-red-500',
+                'high'   => 'bg-orange-400',
+                'medium' => 'bg-amber-400',
+                default  => 'bg-blue-400',
+            };
+            $priorityBadge = match($req->priority) {
+                'urgent' => 'bg-red-100 text-red-700',
+                'high'   => 'bg-orange-100 text-orange-700',
+                'medium' => 'bg-amber-100 text-amber-700',
+                default  => 'bg-blue-100 text-blue-700',
+            };
+            $statusBadge = match($req->status) {
+                'completed'   => 'bg-green-100 text-green-700',
+                'in_progress' => 'bg-blue-100 text-blue-700',
+                'cancelled'   => 'bg-neutral-100 text-neutral-500',
+                default       => 'bg-amber-100 text-amber-700',
+            };
+            $statusLabel = match($req->status) {
+                'in_progress' => 'In Progress',
+                default       => ucfirst($req->status),
+            };
+        @endphp
+        <div class="bg-white rounded-xl shadow-sm border border-neutral-100 flex flex-col overflow-hidden hover:shadow-md transition-shadow">
+            <div class="h-1.5 w-full {{ $priorityStripe }}"></div>
+            <div class="p-5 flex-1 flex flex-col gap-3">
+
+                {{-- Title + ID --}}
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-neutral-900 leading-tight line-clamp-2">{{ $req->title }}</h3>
+                        <p class="text-xs text-neutral-400 mt-0.5">#{{ $req->id }} · {{ $req->facility->name }}</p>
+                    </div>
                 </div>
-                <div class="ml-3">
-                    <p class="text-sm text-neutral-600">Total No of Facilities</p>
-                    <p class="text-lg font-semibold text-neutral-900">{{ $facilities->count() }}</p>
+
+                {{-- Badges --}}
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full {{ $priorityBadge }}">{{ ucfirst($req->priority) }}</span>
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full {{ $statusBadge }}">{{ $statusLabel }}</span>
+                </div>
+
+                {{-- Meta --}}
+                <div class="space-y-1.5 text-xs text-neutral-500">
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span>By {{ $req->requestedBy->name }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span>{{ $req->assignedTo?->name ?? 'Unassigned' }}</span>
+                    </div>
+                    @if($req->due_date)
+                    <div class="flex items-center gap-1.5 {{ $req->due_date < now()->toDateString() && !in_array($req->status, ['completed','cancelled']) ? 'text-red-500 font-medium' : '' }}">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span>Due {{ \Carbon\Carbon::parse($req->due_date)->format('d M Y') }}</span>
+                    </div>
+                    @endif
                 </div>
             </div>
-        </div>
-        
-        <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
-            <div class="flex items-center">
-                <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="user" class="w-5 h-5 text-pink-600"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-neutral-600">Occupancy Rate</p>
-                    <p class="text-lg font-semibold text-neutral-900">
-                        {{ $facilities->where('gender', 'male')->count() }}
-                    </p>
-                </div>
+
+            {{-- Actions --}}
+            <div class="px-5 pb-4 flex gap-2">
+                <a href="{{ route('maintenance.view', $req) }}" class="btn btn-primary btn-sm flex-1 text-center">View</a>
+                @if($isPrivileged)
+                <a href="{{ route('maintenance.edit_request', $req) }}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                </a>
+                <button onclick="confirmDelete({{ $req->id }}, '{{ addslashes($req->title) }}')" class="btn btn-danger btn-sm">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+                @endif
             </div>
         </div>
-        
-        <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
-            <div class="flex items-center">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="user-check" class="w-5 h-5 text-purple-600"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-neutral-600">PendingMaintenance Requests</p>
-                    <p class="text-lg font-semibold text-neutral-900">
-                        {{ $facilities->where('gender', 'female')->count() }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg p-4 shadow-md border border-neutral-100">
-            <div class="flex items-center">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-neutral-600">Recent Admission</p>
-                    <p class="text-lg font-semibold text-neutral-900">
-                        {{ $facilities->where('admission_date', '>=', now()->subMonths(3))->count() }}
-                    </p>
-                </div>
-            </div>
-        </div>
+        @endforeach
     </div>
 
-    <!-- Request Table -->
-    <div class="bg-white rounded-lg shadow-md border border-neutral-100">
-        <div class="p-6 border-b border-neutral-200 flex justify-between">
-            <h3 class="text-lg font-semibold text-neutral-900">Request List </h3>
-            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
-                <i data-lucide="plus" class="w-4 h-4"></i>
-                Add Maintenance Request
-            </a>
-        </div>
-        
-        @if($requests->count() > 0)
-        <div class="overflow-x-auto">
+    <div>{{ $requests->links() }}</div>
 
-            <table class="data-table w-full">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                        <th>Priority</th>
-                        <th>Requested By</th>
-                        <th>Assigned To</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($requests as $request)
-                    <tr>
-                        <td>
-                            <div>
-                                <p class="font-medium text-neutral-900">{{ $request->title }}</p>
-                                <p class="text-sm text-neutral-600">ID: #{{ $request->id }}</p>
-                            </div>
-                        </td>
-                        <td>{{ $request->facility->type }}</td>
-                        <td>{{ $request->description }}</td>
-                        <td>{{ ucfirst($request->priority) }}</td>
-                        <td>{{ $request->requestedBy->name }}</td>
-                        <td>{{ $request->assignedTo->name ?? 'Unassigned'}}</td>
-                        <td>
-                            @if($request->status =='completed')
-                                <span class="badge badge-success">{{ucfirst($request->status)}}</span>
-                            @else
-                                <span class="badge badge-warning">{{ucfirst($request->status)}} </span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('maintenance.view', $request) }}" 
-                                   class="p-1 btn btn-primary"
-                                   title="View Profile">View
-                                </a>
-                                <a href="{{ route('maintenance.edit_request', $request) }}" 
-                                class="p-1 btn btn-success"
-                                   title="Edit">Edit
-                                    <i data-lucide="edit" class="w-4 h-4"></i>
-                                </a>
-                                <button onclick="confirmDelete({{ $request->id }}, '{{ addslashes($request->title) }}')"
-                                        class="p-1 btn btn-danger" title="Delete">Delete
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    @else
+    <div class="bg-white rounded-xl border border-neutral-100 shadow-sm p-16 text-center">
+        <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="wrench" class="w-8 h-8 text-neutral-400"></i>
         </div>
-        @else
-        <div class="p-12 text-center">
-            <i data-lucide="users" class="w-16 h-16 text-neutral-400 mx-auto mb-4"></i>
-            <h3 class="text-lg font-medium text-neutral-900 mb-2">No Maintenance Request found</h3>
-            <p class="text-neutral-600 mb-6">Get started by adding the first Maintenance Request.</p>
-            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
-                <i data-lucide="plus" class="w-4 h-4"></i>
-                Add Maintenance Request
-            </a>
-        </div>
-        @endif
+        <h3 class="text-base font-semibold text-neutral-900 mb-1">No requests found</h3>
+        <p class="text-sm text-neutral-500 mb-6">
+            {{ request()->hasAny(['search','priority','status']) ? 'Try adjusting your filters.' : 'Submit the first maintenance request.' }}
+        </p>
+        <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
+            <i data-lucide="plus" class="w-4 h-4 mr-2 inline-block"></i> New Request
+        </a>
     </div>
+    @endif
+
 </div>
 
-<!-- Delete Confirmation Modal -->
+{{-- Delete Modal --}}
 <div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
-        <div class="p-6">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
-                    <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-zinc-900">Delete Maintenance Request</h3>
+    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+                <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
             </div>
-            <p class="text-zinc-600 text-sm">Are you sure you want to delete <span id="requestName" class="font-semibold text-zinc-900"></span>? This action cannot be undone.</p>
+            <h3 class="text-base font-semibold text-zinc-900">Delete Request</h3>
         </div>
-        <div class="flex justify-end gap-3 px-6 pb-6">
+        <p class="text-sm text-zinc-600 mb-5">
+            Are you sure you want to delete <span id="requestName" class="font-semibold text-zinc-900"></span>?
+            This action cannot be undone.
+        </p>
+        <div class="flex justify-end gap-3">
             <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
             <button onclick="deleteRequest()" class="btn btn-danger">Delete</button>
         </div>
@@ -236,30 +215,26 @@
 
 <script>
 let requestToDelete = null;
-
-function confirmDelete(requestId, requestName) {
-    requestToDelete = requestId;
-    document.getElementById('requestName').textContent = requestName;
+function confirmDelete(id, name) {
+    requestToDelete = id;
+    document.getElementById('requestName').textContent = name;
     document.getElementById('deleteModal').classList.remove('hidden');
 }
-
 function closeDeleteModal() {
     document.getElementById('deleteModal').classList.add('hidden');
     requestToDelete = null;
 }
-
 function deleteRequest() {
     if (!requestToDelete) return;
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/maintenance/${requestToDelete}`;
-    form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">';
+    form.innerHTML = `<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">`;
     document.body.appendChild(form);
     form.submit();
 }
-
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteModal();
+document.getElementById('deleteModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
 });
 </script>
 </x-layouts.app>

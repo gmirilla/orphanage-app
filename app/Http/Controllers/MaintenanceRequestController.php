@@ -14,33 +14,37 @@ class MaintenanceRequestController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isPrivileged = in_array($user->role, ['admin', 'manager']);
+        $isPrivileged = in_array($user->role, ['admin', 'head_of_operations', 'head_of_schools', 'head_of_homes']);
 
         $query = MaintenanceRequest::with(['facility', 'requestedBy', 'assignedTo'])
             ->when(!$isPrivileged, fn($q) => $q->where('requested_by', $user->id));
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('facility', fn($q) => $q->where('name', 'like', "%{$search}%"));
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('facility', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+            });
         }
 
-        if ($request->filled('type')) {
-            $query->where('priority', $request->type);
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
         }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $requests = $query->latest()->get();
+        $requests = $query->latest()->paginate(20)->withQueryString();
 
-        $facilities = Facility::when(!$isPrivileged, function ($q) use ($user) {
-            $q->whereHas('maintenanceRequests', fn($q2) => $q2->where('requested_by', $user->id));
-        })->get();
+        $stats = [
+            'total'       => MaintenanceRequest::when(!$isPrivileged, fn($q) => $q->where('requested_by', $user->id))->count(),
+            'pending'     => MaintenanceRequest::when(!$isPrivileged, fn($q) => $q->where('requested_by', $user->id))->where('status', 'pending')->count(),
+            'in_progress' => MaintenanceRequest::when(!$isPrivileged, fn($q) => $q->where('requested_by', $user->id))->where('status', 'in_progress')->count(),
+            'urgent'      => MaintenanceRequest::when(!$isPrivileged, fn($q) => $q->where('requested_by', $user->id))->where('priority', 'urgent')->whereNotIn('status', ['completed', 'cancelled'])->count(),
+        ];
 
-        $plevels = MaintenanceRequest::select('priority')->distinct()->pluck('priority');
-
-        return view('maintenance.index', compact('requests', 'plevels', 'facilities'));
+        return view('maintenance.index', compact('requests', 'stats', 'isPrivileged'));
     }
 
     public function create()
@@ -79,20 +83,14 @@ class MaintenanceRequestController extends Controller
     public function view(MaintenanceRequest $maintenanceRequest)
     {
         $maintenanceRequest->load('facility', 'requestedBy', 'assignedTo');
-        return view('maintenance.show', compact('maintenanceRequest'));
+        $users = User::whereIn('role', ['admin', 'head_of_operations', 'caregiver'])->where('is_active', true)->orderBy('name')->get();
+        return view('maintenance.show', compact('maintenanceRequest', 'users'));
     }
 
     public function editRequest(MaintenanceRequest $maintenanceRequest)
     {
-        $users = User::all();
+        $users = User::whereIn('role', ['admin', 'head_of_operations', 'caregiver'])->where('is_active', true)->orderBy('name')->get();
         return view('maintenance.edit', compact('maintenanceRequest', 'users'));
-    }
-
-    public function edit(MaintenanceRequest $maintenanceRequest)
-    {
-        $users = User::whereIn('role', ['admin', 'manager', 'caregiver'])->where('is_active', true)->orderBy('name')->get();
-        $facilities = Facility::where('is_active', true)->orderBy('name')->get();
-        return view('maintenance.edit', compact('maintenanceRequest', 'users', 'facilities'));
     }
 
     public function updateStatus(Request $request, MaintenanceRequest $maintenanceRequest)
@@ -113,7 +111,7 @@ class MaintenanceRequestController extends Controller
 
         $maintenanceRequest->update($validated);
 
-        return redirect()->route('maintenance.index')->with('success', 'Maintenance request updated successfully.');
+        return redirect()->route('maintenance.view', $maintenanceRequest)->with('success', 'Maintenance request updated successfully.');
     }
 
     public function assign(Request $request, MaintenanceRequest $maintenanceRequest)

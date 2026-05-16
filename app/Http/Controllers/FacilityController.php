@@ -45,21 +45,31 @@ class FacilityController extends Controller
             $query->where('is_active', $request->status === 'active');
         }
 
-        // Fetch results
-        $facilities = $query->orderBy('name')->paginate(15);
+        // Fetch results with eager-loaded counts
+        $facilities = $query
+            ->withCount(['roomAllocations', 'maintenanceRequests'])
+            ->with('managedBy')
+            ->orderBy('name')
+            ->paginate(15);
 
-        // Facility types
         $types = [
-            'dormitory' => 'dormitory',
-            'classroom' => 'classroom',
-            'kitchen'   => 'kitchen',
-            'clinic'    => 'clinic',
-            'office'    => 'office',
-            'recreation' => 'recreation',
-            'storage'   => 'storage',
+            'dormitory'  => 'Dormitory',
+            'classroom'  => 'Classroom',
+            'kitchen'    => 'Kitchen',
+            'clinic'     => 'Clinic',
+            'office'     => 'Office',
+            'recreation' => 'Recreation',
+            'storage'    => 'Storage',
         ];
 
-        return view('facilities.index', compact('facilities', 'types'));
+        $stats = [
+            'total'               => Facility::count(),
+            'active'              => Facility::where('is_active', true)->count(),
+            'inactive'            => Facility::where('is_active', false)->count(),
+            'pending_maintenance' => MaintenanceRequest::where('status', 'pending')->count(),
+        ];
+
+        return view('facilities.index', compact('facilities', 'types', 'stats'));
     }
 
     /**
